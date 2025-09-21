@@ -29,8 +29,6 @@ const LeadsTable = ({ leads, setLeads }) => {
   const [isEditLeadModalOpen, setIsEditLeadModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [editingLeadId, setEditingLeadId] = useState(null);
-  const [editingLeadName, setEditingLeadName] = useState('');
   const { toast } = useToast();
   const { user, hasPermission } = useAuth();
   
@@ -200,32 +198,6 @@ const LeadsTable = ({ leads, setLeads }) => {
     );
   };
 
-  const handleStartEditing = (lead) => {
-    if (canManageLeads) {
-      setEditingLeadId(lead.id);
-      setEditingLeadName(lead.leadName);
-    }
-  };
-
-  const handleCancelEditing = () => {
-    setEditingLeadId(null);
-    setEditingLeadName('');
-  };
-
-  const handleSaveInlineEdit = () => {
-    if (editingLeadName.trim() === '') {
-      handleCancelEditing();
-      return;
-    }
-    const historyLog = {
-      id: Date.now(),
-      type: 'edit',
-      notes: `Lead name changed to "${editingLeadName}"`,
-      date: new Date().toISOString()
-    };
-    handleSaveLead(editingLeadId, { leadName: editingLeadName }, historyLog);
-    handleCancelEditing();
-  };
 
   return (
     <motion.div
@@ -320,26 +292,9 @@ const LeadsTable = ({ leads, setLeads }) => {
                   </TableCell>
                 )}
                 <TableCell className="text-white font-medium">
-                  {editingLeadId === lead.id ? (
-                    <Input
-                      value={editingLeadName}
-                      onChange={(e) => setEditingLeadName(e.target.value)}
-                      onBlur={handleSaveInlineEdit}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSaveInlineEdit();
-                        if (e.key === 'Escape') handleCancelEditing();
-                      }}
-                      autoFocus
-                      className="bg-slate-700 border-slate-500 h-8"
-                    />
-                  ) : (
-                    <span
-                      className={`inline-block ${canManageLeads ? 'underline decoration-dashed decoration-slate-500 hover:decoration-solid hover:text-blue-400 cursor-pointer' : ''}`}
-                      onClick={() => handleStartEditing(lead)}
-                    >
-                      {lead.leadName}
-                    </span>
-                  )}
+                  <span className="inline-block">
+                    {lead.leadName}
+                  </span>
                 </TableCell>
                 <TableCell className="text-slate-300">{lead.source}</TableCell>
                 <TableCell className="text-slate-300">{lead.contact}</TableCell>
@@ -401,10 +356,7 @@ const LeadsTable = ({ leads, setLeads }) => {
                   />
                 )}
                 <div>
-                  <span
-                    className={`font-bold text-white ${canManageLeads ? 'underline decoration-dashed decoration-slate-500' : ''}`}
-                    onClick={() => canManageLeads && handleStartEditing(lead)}
-                  >
+                  <span className="font-bold text-white">
                     {lead.leadName}
                   </span>
                   <p className="text-sm text-slate-400">{lead.company}</p>
