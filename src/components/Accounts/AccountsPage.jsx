@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Search, Plus, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,14 +9,13 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AccountsTable from './AccountsTable';
 import AccountsKanban from './AccountsKanban';
 import AccountDetailsModal from './AccountDetailsModal';
-import AddAccountModal from './AddAccountModal';
 
 const AccountsPage = ({ accounts, setAccounts }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('table');
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { toast } = useToast();
 
   const filteredAccounts = accounts.filter(account =>
@@ -44,10 +44,6 @@ const AccountsPage = ({ accounts, setAccounts }) => {
     toast({ title: "Client details saved successfully" });
   };
 
-  const handleAddAccount = (newAccount) => {
-    setAccounts([newAccount, ...accounts]);
-    toast({ title: "Client added successfully" });
-  };
 
   return (
     <motion.div
@@ -61,7 +57,7 @@ const AccountsPage = ({ accounts, setAccounts }) => {
           <span className="text-2xl font-bold text-white">Clients</span>
         </div>
         <div className="flex gap-3">
-          <Button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2">
+          <Button onClick={() => navigate('/add-client')} className="flex items-center gap-2">
             <Plus className="w-4 h-4" /> Add Client
           </Button>
         </div>
@@ -114,12 +110,6 @@ const AccountsPage = ({ accounts, setAccounts }) => {
         onClose={() => setIsDetailsModalOpen(false)}
         account={selectedAccount}
         onSave={handleSaveAccount}
-      />
-      
-      <AddAccountModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAdd={handleAddAccount}
       />
     </motion.div>
   );
