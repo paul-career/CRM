@@ -29,7 +29,7 @@ const NavItem = ({ icon: Icon, label, isActive, onClick }) => (
 );
 
 const Sidebar = ({ activeSection, setActiveSection, isOpen, setIsOpen }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
 
   const handleNavigation = (section) => {
     setActiveSection(section);
@@ -53,7 +53,7 @@ const Sidebar = ({ activeSection, setActiveSection, isOpen, setIsOpen }) => {
       </div>
       <div className="flex-1 p-4 space-y-2">
         {navItems.map(item =>
-          user.permissions.includes(item.section) && (
+          hasPermission(item.section) && (
             <NavItem
               key={item.section}
               icon={item.icon}
@@ -67,11 +67,11 @@ const Sidebar = ({ activeSection, setActiveSection, isOpen, setIsOpen }) => {
       <div className="p-4 border-t border-slate-700">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-blue-400 font-bold">
-            {user.name.charAt(0).toUpperCase()}
+            {(user.name || 'U').charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="font-semibold text-white text-sm">{user.name}</p>
-            <p className="text-xs text-slate-400 capitalize">{user.role}</p>
+            <p className="font-semibold text-white text-sm">{user.name || 'User'}</p>
+            <p className="text-xs text-slate-400 capitalize">{user.role || 'user'}</p>
           </div>
         </div>
         <Button variant="outline" className="w-full" onClick={logout}>
