@@ -20,9 +20,12 @@ import { Button } from '@/components/ui/button';
 const DashboardPage = () => {
   const { user, hasPermission } = useAuth();
   const [activeSection, setActiveSection] = useState('dashboard');
-  const [accounts, setAccounts] = useLocalStorage('crmAccounts', sampleClients);
-  const [leads, setLeads] = useLocalStorage('crmLeads', sampleLeads);
+  const [accounts, setAccounts] = useLocalStorage('crmAccounts', sampleClients || []);
+  const [leads, setLeads] = useLocalStorage('crmLeads', sampleLeads || []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Debug logging
+  console.log('DashboardPage rendered:', { user, accounts: accounts?.length, leads: leads?.length, activeSection });
 
   const renderContent = () => {
     const unauthorizedAccess = (
@@ -53,6 +56,15 @@ const DashboardPage = () => {
       default:
         return (
           <div className="space-y-8">
+            {/* Simple test content first */}
+            <div className="glass-effect rounded-xl p-6">
+              <h2 className="text-2xl font-bold text-white mb-4">Dashboard Test</h2>
+              <p className="text-slate-400">If you can see this, the basic dashboard is working.</p>
+              <p className="text-slate-400 mt-2">Clients: {accounts?.length || 0}</p>
+              <p className="text-slate-400">Leads: {leads?.length || 0}</p>
+            </div>
+            
+            {/* Original dashboard components */}
             <DashboardStats clients={accounts} leads={leads} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <RecentActivity leads={leads} />
@@ -115,7 +127,7 @@ const DashboardPage = () => {
                    </Button>
                   <div>
                     <span className="text-2xl sm:text-3xl font-bold text-white capitalize">
-                      {activeSection === 'dashboard' ? `Welcome, ${user?.name}` : activeSection.replace('-', ' ')}
+                      {activeSection === 'dashboard' ? `Welcome, ${user?.name || 'User'}` : activeSection.replace('-', ' ')}
                     </span>
                     <p className="text-slate-400 mt-1 text-sm sm:text-base">
                       {activeSection === 'dashboard' 
@@ -128,7 +140,7 @@ const DashboardPage = () => {
                 
                 <div className="text-right bg-slate-800/50 p-2 px-4 rounded-lg self-end sm:self-center">
                   <p className="text-slate-400 text-xs">Role</p>
-                  <p className="text-white font-medium capitalize">{user?.role}</p>
+                  <p className="text-white font-medium capitalize">{user?.role || 'User'}</p>
                 </div>
               </motion.div>
             </div>
