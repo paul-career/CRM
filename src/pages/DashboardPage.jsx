@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+import { useSearchParams } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -19,10 +20,19 @@ import { Button } from '@/components/ui/button';
 
 const DashboardPage = () => {
   const { user, hasPermission } = useAuth();
+  const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [accounts, setAccounts] = useLocalStorage('crmAccounts', sampleClients || []);
   const [leads, setLeads] = useLocalStorage('crmLeads', sampleLeads || []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Handle URL parameters for navigation
+  useEffect(() => {
+    const section = searchParams.get('section');
+    if (section && ['dashboard', 'accounts', 'leads', 'finance', 'reports', 'user-management', 'settings'].includes(section)) {
+      setActiveSection(section);
+    }
+  }, [searchParams]);
 
   // Debug logging
   console.log('DashboardPage rendered:', { 
