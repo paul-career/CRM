@@ -19,8 +19,8 @@ const AccountsPage = ({ accounts, setAccounts }) => {
   const { toast } = useToast();
 
   const filteredAccounts = accounts.filter(account =>
-    account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    account.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (account.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (account.company || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (account.email && account.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
