@@ -236,7 +236,6 @@ const LeadsTable = ({ leads, setLeads }) => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <span className="text-2xl font-bold text-white">Leads</span>
-          <p className="text-slate-400 mt-1">Track and manage your sales leads</p>
         </div>
         
         <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
