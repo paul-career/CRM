@@ -41,12 +41,12 @@ const AccountsPage = ({ accounts, setAccounts }) => {
 
   const handleSaveAccount = (updatedAccount) => {
     setAccounts(accounts.map(c => c.id === updatedAccount.id ? updatedAccount : c));
-    toast({ title: "Account details saved successfully" });
+    toast({ title: "Client details saved successfully" });
   };
 
   const handleAddAccount = (newAccount) => {
     setAccounts([newAccount, ...accounts]);
-    toast({ title: "Account added successfully" });
+    toast({ title: "Client added successfully" });
   };
 
   return (
@@ -58,12 +58,12 @@ const AccountsPage = ({ accounts, setAccounts }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <span className="text-2xl font-bold text-white">Accounts</span>
-          <p className="text-slate-400 mt-1">Manage your player accounts and guilds</p>
+          <span className="text-2xl font-bold text-white">Clients</span>
+          <p className="text-slate-400 mt-1">Manage your clients and customer relationships</p>
         </div>
         <div className="flex gap-3">
           <Button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add Account
+            <Plus className="w-4 h-4" /> Add Client
           </Button>
         </div>
       </div>
@@ -73,7 +73,7 @@ const AccountsPage = ({ accounts, setAccounts }) => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
           <Input
-            placeholder="Search accounts..."
+            placeholder="Search clients..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 bg-slate-800/50 border-slate-600 text-white placeholder-slate-400"
