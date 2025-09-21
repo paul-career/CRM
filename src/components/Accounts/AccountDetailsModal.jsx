@@ -43,7 +43,7 @@ const AccountDetailsModal = ({ isOpen, onClose, account, onSave }) => {
                 <AvatarImage src={generateAvatarUrl(formData.name)} alt={formData.name} />
                 <AvatarFallback>{formData.name?.charAt(0)}</AvatarFallback>
             </Avatar>
-            Account Details
+            Client Details
           </DialogTitle>
         </DialogHeader>
 
@@ -54,7 +54,7 @@ const AccountDetailsModal = ({ isOpen, onClose, account, onSave }) => {
         >
           <div className="space-y-2">
             <Label htmlFor="name" className="flex items-center gap-2 text-slate-300">
-              <User className="w-4 h-4" /> Player Name
+              <User className="w-4 h-4" /> Client Name
             </Label>
             <Input
               id="name"
@@ -66,7 +66,7 @@ const AccountDetailsModal = ({ isOpen, onClose, account, onSave }) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="company" className="flex items-center gap-2 text-slate-300">
-              <Shield className="w-4 h-4" /> Guild
+              <Shield className="w-4 h-4" /> Company
             </Label>
             <Input
               id="company"
@@ -78,7 +78,7 @@ const AccountDetailsModal = ({ isOpen, onClose, account, onSave }) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="contact" className="flex items-center gap-2 text-slate-300">
-              <Phone className="w-4 h-4" /> Contact / Discord
+              <Phone className="w-4 h-4" /> Phone
             </Label>
             <Input
               id="contact"
@@ -103,7 +103,7 @@ const AccountDetailsModal = ({ isOpen, onClose, account, onSave }) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="location" className="flex items-center gap-2 text-slate-300">
-              <MapPin className="w-4 h-4" /> Server / Region
+              <MapPin className="w-4 h-4" /> Location
             </Label>
             <Input
               id="location"
