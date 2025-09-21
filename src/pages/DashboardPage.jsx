@@ -25,7 +25,13 @@ const DashboardPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Debug logging
-  console.log('DashboardPage rendered:', { user, accounts: accounts?.length, leads: leads?.length, activeSection });
+  console.log('DashboardPage rendered:', { 
+    user: user ? { name: user.name, role: user.role } : null, 
+    accounts: accounts?.length || 0, 
+    leads: leads?.length || 0, 
+    activeSection,
+    hasPermission: typeof hasPermission
+  });
 
   const renderContent = () => {
     const unauthorizedAccess = (
