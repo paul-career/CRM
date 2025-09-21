@@ -84,7 +84,7 @@ const DashboardPage = () => {
   const getPageTitleAndDescription = () => {
     switch (activeSection) {
       case 'accounts':
-        return { title: 'Accounts - CRM', description: 'Manage your game accounts.' };
+        return { title: 'Clients - CRM', description: 'Manage your clients and customer relationships.' };
       case 'leads':
         return { title: 'Leads - CRM', description: 'Track and manage sales leads.' };
       case 'finance':
@@ -133,11 +133,14 @@ const DashboardPage = () => {
                    </Button>
                   <div>
                     <span className="text-2xl sm:text-3xl font-bold text-white capitalize">
-                      {activeSection === 'dashboard' ? `Welcome, ${user?.name || 'User'}` : activeSection.replace('-', ' ')}
+                      {activeSection === 'dashboard' ? `Welcome, ${user?.name || 'User'}` : 
+                       activeSection === 'accounts' ? 'Clients' : activeSection.replace('-', ' ')}
                     </span>
                     <p className="text-slate-400 mt-1 text-sm sm:text-base">
                       {activeSection === 'dashboard' 
                         ? 'Here\'s what\'s happening today.'
+                        : activeSection === 'accounts' 
+                        ? 'Manage your clients and customer relationships.'
                         : `Manage your ${activeSection.replace('-', ' ')}.`
                       }
                     </p>
