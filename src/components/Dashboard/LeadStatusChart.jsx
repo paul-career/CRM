@@ -2,11 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { PieChart } from 'lucide-react';
 
-const LeadStatusChart = ({ leads }) => {
-  const statusCounts = leads.reduce((acc, lead) => {
-    acc[lead.status] = (acc[lead.status] || 0) + 1;
-    return acc;
-  }, {});
+const LeadStatusChart = ({ leads = [] }) => {
+  const safeLeads = Array.isArray(leads) ? leads : [];
+  
+  const statusCounts = safeLeads
+    .filter(lead => lead && lead.status)
+    .reduce((acc, lead) => {
+      acc[lead.status] = (acc[lead.status] || 0) + 1;
+      return acc;
+    }, {});
 
   const statusData = [
     { status: 'not-started', label: 'Not Started', color: 'bg-gray-500', count: statusCounts['not-started'] || 0 },
@@ -15,7 +19,7 @@ const LeadStatusChart = ({ leads }) => {
     { status: 'follow-up', label: 'Follow Up', color: 'bg-yellow-500', count: statusCounts['follow-up'] || 0 }
   ];
 
-  const total = leads.length;
+  const total = safeLeads.length;
 
   return (
     <motion.div
