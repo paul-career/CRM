@@ -49,9 +49,9 @@ const LeadsTable = ({ leads, setLeads }) => {
     return leadsToFilter
       .filter(lead => {
         const matchesSearch = 
-          lead.leadName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lead.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          lead.source.toLowerCase().includes(searchTerm.toLowerCase());
+          (lead.leadName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (lead.company || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (lead.source || '').toLowerCase().includes(searchTerm.toLowerCase());
         
         const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
         
