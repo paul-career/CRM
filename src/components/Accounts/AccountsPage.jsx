@@ -59,7 +59,6 @@ const AccountsPage = ({ accounts, setAccounts }) => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <span className="text-2xl font-bold text-white">Clients</span>
-          <p className="text-slate-400 mt-1">Manage your clients and customer relationships</p>
         </div>
         <div className="flex gap-3">
           <Button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2">
