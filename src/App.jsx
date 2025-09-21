@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
+import AddClientPage from '@/pages/AddClientPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user, isLoading } = useAuth();
@@ -52,6 +53,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/add-client" 
+              element={
+                <ProtectedRoute>
+                  <AddClientPage />
                 </ProtectedRoute>
               } 
             />
