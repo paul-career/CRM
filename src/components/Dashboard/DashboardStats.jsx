@@ -2,32 +2,36 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Target, Phone, TrendingUp } from 'lucide-react';
 
-const DashboardStats = ({ clients, leads }) => {
+const DashboardStats = ({ clients = [], leads = [] }) => {
+  // Safety checks for data
+  const safeClients = Array.isArray(clients) ? clients : [];
+  const safeLeads = Array.isArray(leads) ? leads : [];
+  
   const stats = [
     {
       title: 'Total Clients',
-      value: clients.length,
+      value: safeClients.length,
       icon: Users,
       color: 'from-blue-500 to-cyan-500',
       change: '+12%'
     },
     {
       title: 'Active Leads',
-      value: leads.filter(lead => lead.status !== 'completed').length,
+      value: safeLeads.filter(lead => lead && lead.status !== 'completed').length,
       icon: Target,
       color: 'from-purple-500 to-pink-500',
       change: '+8%'
     },
     {
       title: 'Calls Made',
-      value: leads.reduce((total, lead) => total + lead.callHistory.length, 0),
+      value: safeLeads.reduce((total, lead) => total + (lead?.callHistory?.length || 0), 0),
       icon: Phone,
       color: 'from-green-500 to-emerald-500',
       change: '+15%'
     },
     {
       title: 'Conversion Rate',
-      value: `${Math.round((leads.filter(lead => lead.status === 'completed').length / leads.length) * 100)}%`,
+      value: safeLeads.length > 0 ? `${Math.round((safeLeads.filter(lead => lead && lead.status === 'completed').length / safeLeads.length) * 100)}%` : '0%',
       icon: TrendingUp,
       color: 'from-orange-500 to-red-500',
       change: '+5%'
