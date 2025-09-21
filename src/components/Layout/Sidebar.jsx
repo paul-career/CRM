@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', section: 'dashboard', permissions: ['admin', 'sales', 'user'] },
-  { icon: Users, label: 'Accounts', section: 'accounts', permissions: ['admin', 'sales'] },
+  { icon: Users, label: 'Clients', section: 'accounts', permissions: ['admin', 'sales'] },
   { icon: BarChart, label: 'Leads', section: 'leads', permissions: ['admin', 'sales', 'user'] },
   { icon: DollarSign, label: 'Finance', section: 'finance', permissions: ['admin', 'sales'] },
   { icon: BarChart, label: 'Reports', section: 'reports', permissions: ['admin', 'sales'] },
