@@ -2,13 +2,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Phone, User, Target } from 'lucide-react';
 
-const RecentActivity = ({ leads }) => {
-  const recentActivities = leads
+const RecentActivity = ({ leads = [] }) => {
+  const safeLeads = Array.isArray(leads) ? leads : [];
+  
+  const recentActivities = safeLeads
+    .filter(lead => lead && lead.callHistory && Array.isArray(lead.callHistory))
     .flatMap(lead => 
       lead.callHistory.map(call => ({
         id: `${lead.id}-${call.id}`,
         type: 'call',
-        leadName: lead.leadName,
+        leadName: lead.leadName || 'Unknown Lead',
         date: call.date,
         notes: call.notes,
         icon: Phone
