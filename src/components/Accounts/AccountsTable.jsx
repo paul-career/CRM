@@ -48,14 +48,14 @@ const AccountsTable = ({ accounts, onEdit, onView, onDelete }) => {
         <TableHeader>
           <TableRow className="border-slate-700">
             <TableHead className="text-slate-300 cursor-pointer hover:text-white transition-colors" onClick={() => handleSort('name')}>
-              Player Name {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+              Client Name {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
             </TableHead>
             <TableHead className="text-slate-300 cursor-pointer hover:text-white transition-colors" onClick={() => handleSort('company')}>
-              Guild {sortField === 'company' && (sortDirection === 'asc' ? '↑' : '↓')}
+              Company {sortField === 'company' && (sortDirection === 'asc' ? '↑' : '↓')}
             </TableHead>
             <TableHead className="text-slate-300">Contact</TableHead>
             <TableHead className="text-slate-300 cursor-pointer hover:text-white transition-colors" onClick={() => handleSort('location')}>
-              Server/Region {sortField === 'location' && (sortDirection === 'asc' ? '↑' : '↓')}
+              Location {sortField === 'location' && (sortDirection === 'asc' ? '↑' : '↓')}
             </TableHead>
             <TableHead className="text-slate-300">Status</TableHead>
             <TableHead className="text-slate-300 text-right">Actions</TableHead>
