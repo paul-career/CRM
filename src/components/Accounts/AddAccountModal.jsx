@@ -47,7 +47,7 @@ const AddAccountModal = ({ isOpen, onClose, onAdd }) => {
             <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
               <User className="w-5 h-5 text-white" />
             </div>
-            Add New Account
+            Add New Client
           </DialogTitle>
         </DialogHeader>
 
@@ -59,11 +59,11 @@ const AddAccountModal = ({ isOpen, onClose, onAdd }) => {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="flex items-center gap-2 text-slate-300">
-                <User className="w-4 h-4" /> Player Name
+                <User className="w-4 h-4" /> Client Name
               </Label>
               <Input
                 id="name"
-                placeholder="PlayerOne"
+                placeholder="John Doe"
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 className="bg-slate-800/50 border-slate-600 text-white"
@@ -72,11 +72,11 @@ const AddAccountModal = ({ isOpen, onClose, onAdd }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="company" className="flex items-center gap-2 text-slate-300">
-                <Shield className="w-4 h-4" /> Guild
+                <Shield className="w-4 h-4" /> Company
               </Label>
               <Input
                 id="company"
-                placeholder="The Vanguard"
+                placeholder="Acme Corp"
                 value={formData.company}
                 onChange={(e) => handleChange('company', e.target.value)}
                 className="bg-slate-800/50 border-slate-600 text-white"
@@ -88,11 +88,11 @@ const AddAccountModal = ({ isOpen, onClose, onAdd }) => {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="contact" className="flex items-center gap-2 text-slate-300">
-                <Phone className="w-4 h-4" /> Contact / Discord
+                <Phone className="w-4 h-4" /> Phone
               </Label>
               <Input
                 id="contact"
-                placeholder="playerone#1234"
+                placeholder="+1 (555) 123-4567"
                 value={formData.contact}
                 onChange={(e) => handleChange('contact', e.target.value)}
                 className="bg-slate-800/50 border-slate-600 text-white"
@@ -105,7 +105,7 @@ const AddAccountModal = ({ isOpen, onClose, onAdd }) => {
               <Input
                 id="email"
                 type="email"
-                placeholder="player@email.com"
+                placeholder="client@company.com"
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 className="bg-slate-800/50 border-slate-600 text-white"
@@ -116,11 +116,11 @@ const AddAccountModal = ({ isOpen, onClose, onAdd }) => {
 
           <div className="space-y-2">
             <Label htmlFor="location" className="flex items-center gap-2 text-slate-300">
-              <MapPin className="w-4 h-4" /> Server / Region
+              <MapPin className="w-4 h-4" /> Location
             </Label>
             <Input
               id="location"
-              placeholder="NA East"
+              placeholder="New York, USA"
               value={formData.location}
               onChange={(e) => handleChange('location', e.target.value)}
               className="bg-slate-800/50 border-slate-600 text-white"
