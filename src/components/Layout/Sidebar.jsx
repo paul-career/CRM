@@ -85,7 +85,7 @@ const Sidebar = ({ activeSection, setActiveSection, isOpen, setIsOpen }) => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-slate-800/50 border-r border-slate-700">
+      <aside className="hidden lg:flex lg:flex-col w-64 bg-slate-800/50 border-r border-slate-700 z-30">
         {sidebarContent}
       </aside>
 
