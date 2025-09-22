@@ -40,7 +40,8 @@ const DashboardPage = () => {
     accounts: accounts?.length || 0, 
     leads: leads?.length || 0, 
     activeSection,
-    hasPermission: typeof hasPermission
+    hasPermission: typeof hasPermission,
+    isSidebarOpen
   });
 
   const renderContent = () => {
@@ -124,7 +125,7 @@ const DashboardPage = () => {
       <div className="flex min-h-screen bg-slate-900">
         <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto lg:ml-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
