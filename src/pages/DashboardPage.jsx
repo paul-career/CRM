@@ -166,8 +166,6 @@ const DashboardPage = () => {
                         ? 'Here\'s what\'s happening today.'
                         : activeSection === 'accounts' 
                         ? 'Manage your clients and customer relationships.'
-                        : activeSection === 'meeting'
-                        ? 'Manage your meetings and appointments.'
                         : `Manage your ${activeSection.replace('-', ' ')}.`
                       }
                     </p>
