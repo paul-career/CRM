@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     const permissions = {
       admin: ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'user-management', 'settings', 'import-leads'],
       sales: ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'settings', 'import-leads'],
-      user: ['dashboard', 'leads', 'meeting']
+      user: ['dashboard', 'leads']
     };
     
     const userPermissions = permissions[user.role];
