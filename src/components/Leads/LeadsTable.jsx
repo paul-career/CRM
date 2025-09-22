@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Search, Eye, Phone, Plus, Upload, Filter, UserPlus, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,12 +12,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import CallLogModal from './CallLogModal';
 import LeadDetailsModal from './LeadDetailsModal';
-import AddLeadModal from './AddLeadModal';
 import EditLeadModal from './EditLeadModal';
 import ImportLeadsModal from './ImportLeadsModal';
 import AssignLeadsModal from './AssignLeadsModal';
 
 const LeadsTable = ({ leads, setLeads }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortField, setSortField] = useState('leadName');
@@ -25,7 +26,6 @@ const LeadsTable = ({ leads, setLeads }) => {
   const [selectedLeads, setSelectedLeads] = useState([]);
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
   const [isEditLeadModalOpen, setIsEditLeadModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -131,10 +131,6 @@ const LeadsTable = ({ leads, setLeads }) => {
     });
   };
 
-  const handleAddLead = (newLead) => {
-    setLeads([newLead, ...leads]);
-    toast({ title: "Lead added successfully" });
-  };
   
   const handleSaveLead = (leadId, updatedData, historyLog) => {
     setLeads(leads.map(lead => {
@@ -216,7 +212,7 @@ const LeadsTable = ({ leads, setLeads }) => {
               <Upload className="w-4 h-4" /> <span className="hidden sm:inline">Import CSV</span>
             </Button>
           )}
-          <Button onClick={() => setIsAddLeadModalOpen(true)} className="flex-1 sm:flex-none flex items-center gap-2">
+          <Button onClick={() => navigate('/add-lead')} className="flex-1 sm:flex-none flex items-center gap-2">
             <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Lead</span>
           </Button>
         </div>
@@ -393,7 +389,6 @@ const LeadsTable = ({ leads, setLeads }) => {
 
       <CallLogModal isOpen={isCallModalOpen} onClose={() => setIsCallModalOpen(false)} lead={selectedLead} onSave={handleCallLogSave} />
       <LeadDetailsModal isOpen={isDetailsModalOpen} onClose={() => setIsDetailsModalOpen(false)} lead={selectedLead} />
-      <AddLeadModal isOpen={isAddLeadModalOpen} onClose={() => setIsAddLeadModalOpen(false)} onAdd={handleAddLead} />
       <EditLeadModal isOpen={isEditLeadModalOpen} onClose={() => setIsEditLeadModalOpen(false)} lead={selectedLead} onSave={handleSaveLead} />
       <ImportLeadsModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onImport={handleImportLeads} roundRobinEnabled={settings.roundRobin} />
       {canManageLeads && <AssignLeadsModal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} onAssign={handleManualAssign} />}
