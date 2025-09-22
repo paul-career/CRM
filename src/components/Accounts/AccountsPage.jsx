@@ -53,7 +53,18 @@ const AccountsPage = ({ accounts, setAccounts }) => {
     >
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
+        <div className="flex items-center gap-3">
+          {/* Clients Logo */}
+          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white">
+              {/* First person (front) */}
+              <circle cx="8" cy="6" r="3" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+              <path d="M5 18c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+              {/* Second person (behind) */}
+              <circle cx="16" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+              <path d="M13.5 19c0-2 1.5-3.5 3.5-3.5s3.5 1.5 3.5 3.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+            </svg>
+          </div>
           <span className="text-2xl font-bold text-white">Clients</span>
         </div>
         <div className="flex gap-3">
