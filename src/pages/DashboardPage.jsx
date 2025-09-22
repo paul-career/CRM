@@ -29,7 +29,7 @@ const DashboardPage = () => {
   // Handle URL parameters for navigation
   useEffect(() => {
     const section = searchParams.get('section');
-    if (section && ['dashboard', 'accounts', 'leads', 'finance', 'reports', 'user-management', 'settings'].includes(section)) {
+    if (section && ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'user-management', 'settings'].includes(section)) {
       setActiveSection(section);
     }
   }, [searchParams]);
@@ -57,6 +57,17 @@ const DashboardPage = () => {
       
       case 'leads':
         return hasPermission('leads') ? <LeadsTable leads={leads} setLeads={setLeads} /> : unauthorizedAccess;
+      
+      case 'meeting':
+        return hasPermission('meeting') ? (
+          <div className="glass-effect rounded-xl p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">Meeting Fixed</h2>
+            <p className="text-slate-400">Manage your meetings and appointments.</p>
+            <div className="mt-6 p-4 bg-slate-800/30 rounded-lg">
+              <p className="text-slate-300">Meeting functionality coming soon...</p>
+            </div>
+          </div>
+        ) : unauthorizedAccess;
       
       case 'finance':
         return hasPermission('finance') ? <FinancePage leads={leads} /> : unauthorizedAccess;
@@ -98,6 +109,8 @@ const DashboardPage = () => {
         return { title: 'Clients - CRM', description: 'Manage your clients and customer relationships.' };
       case 'leads':
         return { title: 'Leads - CRM', description: 'Track and manage sales leads.' };
+      case 'meeting':
+        return { title: 'Meeting Fixed - CRM', description: 'Manage your meetings and appointments.' };
       case 'finance':
         return { title: 'Finance - CRM', description: 'View financial data and reports.' };
       case 'reports':
@@ -145,13 +158,16 @@ const DashboardPage = () => {
                   <div>
                     <span className="text-2xl sm:text-3xl font-bold text-white capitalize">
                       {activeSection === 'dashboard' ? `Welcome, ${user?.name || 'User'}` : 
-                       activeSection === 'accounts' ? 'Clients' : activeSection.replace('-', ' ')}
+                       activeSection === 'accounts' ? 'Clients' : 
+                       activeSection === 'meeting' ? 'Meeting Fixed' : activeSection.replace('-', ' ')}
                     </span>
                     <p className="text-slate-400 mt-1 text-sm sm:text-base">
                       {activeSection === 'dashboard' 
                         ? 'Here\'s what\'s happening today.'
                         : activeSection === 'accounts' 
                         ? 'Manage your clients and customer relationships.'
+                        : activeSection === 'meeting'
+                        ? 'Manage your meetings and appointments.'
                         : `Manage your ${activeSection.replace('-', ' ')}.`
                       }
                     </p>
