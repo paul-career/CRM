@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import { useSearchParams } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { sampleClients, sampleLeads } from '@/data/sampleData';
+import { useToast } from '@/components/ui/use-toast';
 import Sidebar from '@/components/Layout/Sidebar';
 import DashboardStats from '@/components/Dashboard/DashboardStats';
 import RecentActivity from '@/components/Dashboard/RecentActivity';
@@ -20,6 +21,7 @@ import { Button } from '@/components/ui/button';
 
 const DashboardPage = () => {
   const { user, hasPermission } = useAuth();
+  const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [accounts, setAccounts] = useLocalStorage('crmAccounts', sampleClients || []);
@@ -49,6 +51,32 @@ const DashboardPage = () => {
       setLeads(prev => prev.map(lead => 
         lead.id === leadId ? { ...lead, status: newStatus } : lead
       ));
+    }
+  };
+
+  // Function to reopen a meeting (move back to leads)
+  const handleReopenMeeting = (meetingId) => {
+    const meetingToReopen = meetings.find(meeting => meeting.id === meetingId);
+    if (meetingToReopen) {
+      // Remove completedAt and change status to in-progress
+      const reopenedLead = {
+        ...meetingToReopen,
+        status: 'in-progress',
+        completedAt: undefined
+      };
+      delete reopenedLead.completedAt;
+      
+      // Add back to leads
+      setLeads(prev => [reopenedLead, ...prev]);
+      
+      // Remove from meetings
+      setMeetings(prev => prev.filter(meeting => meeting.id !== meetingId));
+      
+      // Show success message
+      toast({
+        title: "Meeting reopened successfully!",
+        description: `${meetingToReopen.leadName} has been moved back to leads.`
+      });
     }
   };
 
@@ -87,8 +115,7 @@ const DashboardPage = () => {
       case 'meeting':
         return hasPermission('meeting') ? (
           <div className="glass-effect rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Meeting Fixed</h2>
-            <p className="text-slate-400">Completed leads and meetings.</p>
+            <h2 className="text-2xl font-bold text-white mb-4">Completed leads and meetings</h2>
             
             {meetings.length > 0 ? (
               <div className="mt-6">
@@ -103,9 +130,18 @@ const DashboardPage = () => {
                       </div>
                       <p className="text-slate-300 text-sm mb-1">{meeting.company}</p>
                       <p className="text-slate-400 text-xs mb-2">{meeting.contact}</p>
-                      <p className="text-slate-400 text-xs">
+                      <p className="text-slate-400 text-xs mb-3">
                         Completed: {new Date(meeting.completedAt).toLocaleDateString()}
                       </p>
+                      <Button
+                        onClick={() => handleReopenMeeting(meeting.id)}
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-slate-300 border-slate-600 hover:bg-slate-700 hover:text-white"
+                      >
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        Reopen
+                      </Button>
                     </div>
                   ))}
                 </div>
