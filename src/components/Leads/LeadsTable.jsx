@@ -16,7 +16,7 @@ import EditLeadModal from './EditLeadModal';
 import ImportLeadsModal from './ImportLeadsModal';
 import AssignLeadsModal from './AssignLeadsModal';
 
-const LeadsTable = ({ leads, setLeads }) => {
+const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -123,12 +123,20 @@ const LeadsTable = ({ leads, setLeads }) => {
   };
 
   const handleStatusUpdate = (leadId, newStatus) => {
-    setLeads(leads.map(lead => 
-      lead.id === leadId ? { ...lead, status: newStatus } : lead
-    ));
-    toast({
-      title: "Lead status updated successfully"
-    });
+    if (onLeadStatusChange) {
+      onLeadStatusChange(leadId, newStatus);
+      toast({
+        title: newStatus === 'completed' ? "Lead completed and moved to meetings!" : "Lead status updated successfully"
+      });
+    } else {
+      // Fallback to old behavior if onLeadStatusChange is not provided
+      setLeads(leads.map(lead => 
+        lead.id === leadId ? { ...lead, status: newStatus } : lead
+      ));
+      toast({
+        title: "Lead status updated successfully"
+      });
+    }
   };
 
   
