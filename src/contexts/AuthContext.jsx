@@ -68,15 +68,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   const hasPermission = (permission) => {
-    if (!user) return false;
+    if (!user || !user.role) return false;
     
     const permissions = {
-      admin: ['dashboard', 'accounts', 'leads', 'finance', 'reports', 'user-management', 'settings', 'import-leads'],
-      sales: ['dashboard', 'accounts', 'leads', 'finance', 'reports', 'settings', 'import-leads'],
-      user: ['leads']
+      admin: ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'user-management', 'settings', 'import-leads'],
+      sales: ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'settings', 'import-leads'],
+      user: ['dashboard', 'leads', 'meeting']
     };
     
-    return permissions[user.role]?.includes(permission) || false;
+    const userPermissions = permissions[user.role];
+    return userPermissions ? userPermissions.includes(permission) : false;
   };
 
   const value = {
