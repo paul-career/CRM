@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Users, BarChart, DollarSign, Settings, UserCog, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Users, BarChart, DollarSign, Settings, UserCog, LogOut, X, Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 
@@ -8,6 +8,7 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', section: 'dashboard', permissions: ['admin', 'sales', 'user'] },
   { icon: Users, label: 'Clients', section: 'accounts', permissions: ['admin', 'sales'] },
   { icon: BarChart, label: 'Leads', section: 'leads', permissions: ['admin', 'sales', 'user'] },
+  { icon: Calendar, label: 'Meeting Fixed', section: 'meeting', permissions: ['admin', 'sales', 'user'] },
   { icon: DollarSign, label: 'Finance', section: 'finance', permissions: ['admin', 'sales'] },
   { icon: BarChart, label: 'Reports', section: 'reports', permissions: ['admin', 'sales'] },
   { icon: UserCog, label: 'User Management', section: 'user-management', permissions: ['admin'] },
