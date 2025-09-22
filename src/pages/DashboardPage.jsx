@@ -24,7 +24,33 @@ const DashboardPage = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [accounts, setAccounts] = useLocalStorage('crmAccounts', sampleClients || []);
   const [leads, setLeads] = useLocalStorage('crmLeads', sampleLeads || []);
+  const [meetings, setMeetings] = useLocalStorage('crmMeetings', []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Function to move completed leads to meetings
+  const handleLeadStatusChange = (leadId, newStatus) => {
+    if (newStatus === 'completed') {
+      // Find the lead to move
+      const leadToMove = leads.find(lead => lead.id === leadId);
+      if (leadToMove) {
+        // Add to meetings with completion date
+        const completedLead = {
+          ...leadToMove,
+          completedAt: new Date().toISOString(),
+          status: 'completed'
+        };
+        setMeetings(prev => [completedLead, ...prev]);
+        
+        // Remove from leads
+        setLeads(prev => prev.filter(lead => lead.id !== leadId));
+      }
+    } else {
+      // For other status changes, just update the lead
+      setLeads(prev => prev.map(lead => 
+        lead.id === leadId ? { ...lead, status: newStatus } : lead
+      ));
+    }
+  };
 
   // Handle URL parameters for navigation
   useEffect(() => {
@@ -56,16 +82,39 @@ const DashboardPage = () => {
         return hasPermission('accounts') ? <AccountsPage accounts={accounts} setAccounts={setAccounts} /> : unauthorizedAccess;
       
       case 'leads':
-        return hasPermission('leads') ? <LeadsTable leads={leads} setLeads={setLeads} /> : unauthorizedAccess;
+        return hasPermission('leads') ? <LeadsTable leads={leads} setLeads={setLeads} onLeadStatusChange={handleLeadStatusChange} /> : unauthorizedAccess;
       
       case 'meeting':
         return hasPermission('meeting') ? (
           <div className="glass-effect rounded-xl p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Meeting Fixed</h2>
-            <p className="text-slate-400">Manage your meetings and appointments.</p>
-            <div className="mt-6 p-4 bg-slate-800/30 rounded-lg">
-              <p className="text-slate-300">Meeting functionality coming soon...</p>
-            </div>
+            <p className="text-slate-400">Completed leads and meetings.</p>
+            
+            {meetings.length > 0 ? (
+              <div className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {meetings.map((meeting) => (
+                    <div key={meeting.id} className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-white font-semibold">{meeting.leadName}</h3>
+                        <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded-full text-xs">
+                          Completed
+                        </span>
+                      </div>
+                      <p className="text-slate-300 text-sm mb-1">{meeting.company}</p>
+                      <p className="text-slate-400 text-xs mb-2">{meeting.contact}</p>
+                      <p className="text-slate-400 text-xs">
+                        Completed: {new Date(meeting.completedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-6 p-4 bg-slate-800/30 rounded-lg">
+                <p className="text-slate-300">No completed leads yet. Complete some leads to see them here.</p>
+              </div>
+            )}
           </div>
         ) : unauthorizedAccess;
       
