@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
 import AddClientPage from '@/pages/AddClientPage';
+import AddLeadPage from '@/pages/AddLeadPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user, isLoading } = useAuth();
@@ -61,6 +62,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AddClientPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/add-lead" 
+              element={
+                <ProtectedRoute>
+                  <AddLeadPage />
                 </ProtectedRoute>
               } 
             />
