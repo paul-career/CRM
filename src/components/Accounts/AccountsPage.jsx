@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/components/ui/use-toast';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AccountsTable from './AccountsTable';
@@ -37,7 +36,6 @@ const AccountsPage = ({ accounts, setAccounts }) => {
     (account.email && account.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const generateAvatarUrl = (seed) => `https://api.dicebear.com/7.x/pixel-art/svg?seed=${seed}`;
 
   const handleView = (account) => {
     setSelectedAccount(account);
@@ -290,11 +288,7 @@ const AccountsPage = ({ accounts, setAccounts }) => {
           className="mb-6"
         >
           <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-3 mb-6">
-              <Avatar>
-                <AvatarImage src={generateAvatarUrl(detailsFormData.name)} alt={detailsFormData.name} />
-                <AvatarFallback>{detailsFormData.name?.charAt(0)}</AvatarFallback>
-              </Avatar>
+            <div className="mb-6">
               <span className="text-xl font-bold text-white">Client Details</span>
             </div>
             
