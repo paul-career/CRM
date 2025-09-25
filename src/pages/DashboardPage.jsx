@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import { useSearchParams } from 'react-router-dom';
-import { Menu, RotateCcw } from 'lucide-react';
+import { Menu, RotateCcw, Search } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -19,6 +19,7 @@ import ReportsPage from '@/components/Reports/ReportsPage';
 import UserManagementPage from '@/components/UserManagement/UserManagementPage';
 import SettingsPage from '@/components/Settings/SettingsPage';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const DashboardPage = () => {
   const { user, hasPermission } = useAuth();
@@ -46,6 +47,7 @@ const DashboardPage = () => {
   }, [leads, setLeads]);
   const [meetings, setMeetings] = useLocalStorage('crmMeetings', []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [meetingSearchTerm, setMeetingSearchTerm] = useState('');
 
   // Function to move completed leads to meetings
   const handleLeadStatusChange = (leadId, newStatus) => {
@@ -131,9 +133,37 @@ const DashboardPage = () => {
         return hasPermission('leads') ? <LeadsTable leads={leads} setLeads={setLeads} onLeadStatusChange={handleLeadStatusChange} /> : unauthorizedAccess;
       
       case 'meeting':
+        // Filter meetings based on search term
+        const filteredMeetings = meetings.filter(meeting => {
+          const searchLower = meetingSearchTerm.toLowerCase();
+          return (
+            (meeting.leadName || '').toLowerCase().includes(searchLower) ||
+            (meeting.company || '').toLowerCase().includes(searchLower) ||
+            (meeting.contact || '').toLowerCase().includes(searchLower) ||
+            (meeting.assignedTo || '').toLowerCase().includes(searchLower) ||
+            (meeting.date || '').toLowerCase().includes(searchLower)
+          );
+        });
+
         return hasPermission('meeting') ? (
           <div className="glass-effect rounded-xl p-6">
             <h2 className="text-2xl font-bold text-white mb-6">Completed leads and meetings</h2>
+            
+            {/* Search Bar */}
+            {meetings.length > 0 && (
+              <div className="mb-6">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search completed leads..."
+                    value={meetingSearchTerm}
+                    onChange={(e) => setMeetingSearchTerm(e.target.value)}
+                    className="pl-10 bg-slate-800/50 border-slate-600 text-white placeholder-slate-400"
+                  />
+                </div>
+              </div>
+            )}
             
             {meetings.length > 0 ? (
               <div className="mt-6">
@@ -151,31 +181,39 @@ const DashboardPage = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {meetings.map((meeting) => (
-                        <TableRow key={meeting.id} className="border-slate-700 hover:bg-slate-800/30">
-                          <TableCell className="text-slate-300">{meeting.date || 'N/A'}</TableCell>
-                          <TableCell className="text-white font-medium">
-                            {meeting.leadName}
-                          </TableCell>
-                          <TableCell className="text-slate-300">{meeting.contact}</TableCell>
-                          <TableCell className="text-slate-300">{meeting.company}</TableCell>
-                          <TableCell className="text-slate-300">
-                            {new Date(meeting.completedAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="text-slate-300">{meeting.assignedTo}</TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              onClick={() => handleReopenMeeting(meeting.id)}
-                              variant="outline"
-                              size="sm"
-                              className="text-slate-300 border-slate-600 hover:bg-slate-700 hover:text-white"
-                            >
-                              <RotateCcw className="w-4 h-4 mr-2" />
-                              Reopen
-                            </Button>
+                      {filteredMeetings.length > 0 ? (
+                        filteredMeetings.map((meeting) => (
+                          <TableRow key={meeting.id} className="border-slate-700 hover:bg-slate-800/30">
+                            <TableCell className="text-slate-300">{meeting.date || 'N/A'}</TableCell>
+                            <TableCell className="text-white font-medium">
+                              {meeting.leadName}
+                            </TableCell>
+                            <TableCell className="text-slate-300">{meeting.contact}</TableCell>
+                            <TableCell className="text-slate-300">{meeting.company}</TableCell>
+                            <TableCell className="text-slate-300">
+                              {new Date(meeting.completedAt).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell className="text-slate-300">{meeting.assignedTo}</TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                onClick={() => handleReopenMeeting(meeting.id)}
+                                variant="outline"
+                                size="sm"
+                                className="text-slate-300 border-slate-600 hover:bg-slate-700 hover:text-white"
+                              >
+                                <RotateCcw className="w-4 h-4 mr-2" />
+                                Reopen
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center text-slate-400 py-8">
+                            No completed leads found matching your search.
                           </TableCell>
                         </TableRow>
-                      ))}
+                      )}
                     </TableBody>
                   </Table>
                 </div>
