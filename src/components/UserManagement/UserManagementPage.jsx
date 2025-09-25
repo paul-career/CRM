@@ -97,14 +97,19 @@ const UserManagementPage = () => {
 
     const getRoleBadge = (role) => {
         const roleClasses = {
-          admin: 'status-badge status-destructive',
-          sales: 'status-badge status-in-progress',
-          user: 'status-badge status-pending'
+          'super-admin': 'status-badge status-destructive',
+          lead: 'status-badge status-in-progress',
+          agent: 'status-badge status-pending'
+        };
+        const roleDisplayNames = {
+          'super-admin': 'Super Admin',
+          lead: 'Lead',
+          agent: 'Agent'
         };
         return (
           <span className={`${roleClasses[role] || 'status-badge'} flex items-center gap-1.5`}>
             <Shield className="w-3 h-3"/>
-            {role.charAt(0).toUpperCase() + role.slice(1)}
+            {roleDisplayNames[role] || role.charAt(0).toUpperCase() + role.slice(1)}
           </span>
         );
     };
@@ -201,9 +206,9 @@ const UserManagementPage = () => {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="bg-slate-800 border-slate-600">
-                                    <SelectItem value="user">User</SelectItem>
-                                    <SelectItem value="sales">Sales</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="agent">Agent</SelectItem>
+                                    <SelectItem value="lead">Lead</SelectItem>
+                                    <SelectItem value="super-admin">Super Admin</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
