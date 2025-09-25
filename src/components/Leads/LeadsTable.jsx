@@ -11,7 +11,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import ImportLeadsModal from './ImportLeadsModal';
 import AssignLeadsModal from './AssignLeadsModal';
 
 const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
@@ -21,12 +20,12 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
   const [sortDirection, setSortDirection] = useState('asc');
   const [selectedLead, setSelectedLead] = useState(null);
   const [selectedLeads, setSelectedLeads] = useState([]);
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDetailsView, setShowDetailsView] = useState(false);
   const [showCallView, setShowCallView] = useState(false);
   const [showEditView, setShowEditView] = useState(false);
+  const [showImportForm, setShowImportForm] = useState(false);
   const [isEditingDetails, setIsEditingDetails] = useState(false);
   const [formData, setFormData] = useState({
     leadName: '',
@@ -44,6 +43,8 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     nextFollowUp: '',
     status: ''
   });
+  const [importFile, setImportFile] = useState(null);
+  const [importError, setImportError] = useState('');
   const { toast } = useToast();
   const { user, hasPermission } = useAuth();
   
@@ -176,10 +177,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     toast({ title: "Lead updated successfully" });
   };
 
-  const handleImportLeads = (newLeads) => {
-    setLeads([...newLeads, ...leads]);
-    toast({ title: `${newLeads.length} leads imported successfully!` });
-  };
 
 
   const handleFormChange = (field, value) => {
@@ -308,6 +305,90 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     });
   };
 
+  const handleImportFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'text/csv') {
+      setImportFile(file);
+      setImportError('');
+    } else {
+      setImportError('Please select a valid CSV file.');
+    }
+  };
+
+  const handleImportDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'text/csv') {
+      setImportFile(file);
+      setImportError('');
+    } else {
+      setImportError('Please select a valid CSV file.');
+    }
+  };
+
+  const handleImportDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleImportLeads = () => {
+    if (!importFile) {
+      setImportError("Please select a file to import.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const csv = e.target.result;
+      const lines = csv.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      
+      // Check required headers
+      const requiredHeaders = ['leadname', 'company', 'email'];
+      const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+      
+      if (missingHeaders.length > 0) {
+        setImportError(`Missing required headers: ${missingHeaders.join(', ')}`);
+        return;
+      }
+
+      const newLeads = [];
+      for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim()) {
+          const values = lines[i].split(',').map(v => v.trim());
+          const lead = {
+            id: Date.now() + i,
+            leadName: values[headers.indexOf('leadname')] || '',
+            company: values[headers.indexOf('company')] || '',
+            email: values[headers.indexOf('email')] || '',
+            contact: values[headers.indexOf('contact')] || '',
+            source: values[headers.indexOf('source')] || 'CSV Import',
+            notes: values[headers.indexOf('notes')] || '',
+            status: 'not-started',
+            assignedTo: settings.roundRobin ? 
+              (i % 2 === 0 ? 'admin@crm.com' : 'sales@crm.com') : 
+              user.email,
+            createdAt: new Date().toISOString(),
+            callHistory: []
+          };
+          newLeads.push(lead);
+        }
+      }
+
+      setLeads([...newLeads, ...leads]);
+      setShowImportForm(false);
+      setImportFile(null);
+      setImportError('');
+      toast({ title: `${newLeads.length} leads imported successfully!` });
+    };
+    reader.readAsText(importFile);
+  };
+
+  const handleCancelImport = () => {
+    setShowImportForm(false);
+    setImportFile(null);
+    setImportError('');
+  };
+
   const getStatusBadge = (status) => {
     const statusClasses = {
       'not-started': 'status-badge status-not-started',
@@ -339,7 +420,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex items-center gap-3">
-          {(showAddForm || showDetailsView || showCallView || showEditView) && (
+          {(showAddForm || showDetailsView || showCallView || showEditView || showImportForm) && (
             <Button 
               variant="ghost" 
               size="icon" 
@@ -347,6 +428,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
                 if (showAddForm) handleCancelAdd();
                 if (showDetailsView || showEditView) handleCancelDetails();
                 if (showCallView) handleCancelCall();
+                if (showImportForm) handleCancelImport();
               }}
               className="text-slate-400 hover:text-white"
             >
@@ -356,15 +438,16 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
           <span className="text-2xl font-bold text-white">
             {showAddForm ? 'Add New Lead' : 
              showDetailsView ? 'Lead Details' :
-             showCallView ? 'Call Log' :
-             showEditView ? 'Edit Lead' : 'Your Leads'}
+             showCallView ? 'Virtual Call' :
+             showEditView ? 'Edit Lead' :
+             showImportForm ? 'Import Leads from CSV' : 'Your Leads'}
           </span>
         </div>
         
-        {!showAddForm && !showDetailsView && !showCallView && !showEditView && (
+        {!showAddForm && !showDetailsView && !showCallView && !showEditView && !showImportForm && (
           <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
             {canImportLeads && (
-              <Button onClick={() => setIsImportModalOpen(true)} variant="outline" className="flex-1 sm:flex-none flex items-center gap-2">
+              <Button onClick={() => setShowImportForm(true)} variant="outline" className="flex-1 sm:flex-none flex items-center gap-2">
                 <Upload className="w-4 h-4" /> <span className="hidden sm:inline">Import CSV</span>
               </Button>
             )}
@@ -791,8 +874,109 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         </motion.div>
       )}
 
+      {/* Import CSV Form */}
+      {showImportForm && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700 max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                  <Upload className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-xl font-bold text-white">Import Leads from CSV</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleCancelImport}
+                className="text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* File Upload Area */}
+              <div 
+                className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-slate-500 transition-colors cursor-pointer"
+                onDrop={handleImportDrop}
+                onDragOver={handleImportDragOver}
+                onClick={() => document.getElementById('csv-file-input').click()}
+              >
+                <div className="w-16 h-16 bg-slate-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Upload className="w-8 h-8 text-slate-400" />
+                </div>
+                <p className="text-slate-300 mb-2">Drag & drop your CSV file here</p>
+                <p className="text-slate-400 text-sm mb-4">or</p>
+                <Button variant="outline" className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600">
+                  Browse Files
+                </Button>
+                <input
+                  id="csv-file-input"
+                  type="file"
+                  accept=".csv"
+                  onChange={handleImportFileChange}
+                  className="hidden"
+                />
+              </div>
+
+              {importFile && (
+                <div className="bg-slate-700/50 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{importFile.name}</p>
+                      <p className="text-slate-400 text-sm">{(importFile.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {importError && (
+                <div className="bg-red-900/30 border border-red-500 rounded-lg p-4">
+                  <p className="text-red-400 text-sm">{importError}</p>
+                </div>
+              )}
+
+              {/* Instructions */}
+              <div className="space-y-3">
+                <h4 className="text-white font-semibold">Instructions:</h4>
+                <ul className="text-slate-300 text-sm space-y-1">
+                  <li>• Required headers: <code className="bg-slate-700 px-2 py-1 rounded">leadName</code>, <code className="bg-slate-700 px-2 py-1 rounded">company</code>, <code className="bg-slate-700 px-2 py-1 rounded">email</code></li>
+                  <li>• Optional headers: <code className="bg-slate-700 px-2 py-1 rounded">contact</code>, <code className="bg-slate-700 px-2 py-1 rounded">source</code>, <code className="bg-slate-700 px-2 py-1 rounded">notes</code></li>
+                  <li>• Status is set to 'not-started' automatically</li>
+                  <li>• If Round-Robin is enabled in settings, leads will be auto-assigned. Otherwise, they are assigned to you</li>
+                </ul>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={handleCancelImport}>
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleImportLeads} 
+                  disabled={!importFile}
+                  className="bg-gradient-to-r from-green-500 to-blue-500 disabled:opacity-50"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Import Leads
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Search and Filter - Only show when not in any form mode */}
-      {!showAddForm && !showDetailsView && !showCallView && !showEditView && (
+      {!showAddForm && !showDetailsView && !showCallView && !showEditView && !showImportForm && (
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -825,7 +1009,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
       )}
 
       {/* Desktop Table View - Only show when not in any form mode */}
-      {!showAddForm && !showDetailsView && !showCallView && !showEditView && (
+      {!showAddForm && !showDetailsView && !showCallView && !showEditView && !showImportForm && (
         <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
@@ -901,7 +1085,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
       )}
 
       {/* Mobile Card View - Only show when not in any form mode */}
-      {!showAddForm && !showDetailsView && !showCallView && !showEditView && (
+      {!showAddForm && !showDetailsView && !showCallView && !showEditView && !showImportForm && (
         <div className="grid grid-cols-1 gap-4 md:hidden">
         {canManageLeads && (
           <div className="flex items-center p-2">
@@ -963,11 +1147,10 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         </div>
       )}
 
-      {!showAddForm && !showDetailsView && !showCallView && !showEditView && filteredLeads.length === 0 && (
+      {!showAddForm && !showDetailsView && !showCallView && !showEditView && !showImportForm && filteredLeads.length === 0 && (
         <div className="text-center py-8"><p className="text-slate-400">No leads found</p></div>
       )}
 
-      <ImportLeadsModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onImport={handleImportLeads} roundRobinEnabled={settings.roundRobin} />
       {canManageLeads && <AssignLeadsModal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} onAssign={handleManualAssign} />}
     </motion.div>
   );
