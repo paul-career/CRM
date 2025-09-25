@@ -610,6 +610,71 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
                 <div className="text-white font-medium">{detailsFormData.notes || 'No notes available'}</div>
               </div>
 
+              {/* Additional Lead Information */}
+              <div className="border-t border-slate-600 pt-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Additional Information</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-slate-300">
+                      <ArrowRightCircle className="w-4 h-4" /> Lead Source
+                    </Label>
+                    <div className="text-white font-medium">-</div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-slate-300">
+                      <ArrowRightCircle className="w-4 h-4" /> Follow-Up Status
+                    </Label>
+                    <div className="text-white font-medium">-</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-slate-300">
+                      <ArrowRightCircle className="w-4 h-4" /> Next Action Date
+                    </Label>
+                    <div className="text-white font-medium">-</div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-slate-300">
+                      <ArrowRightCircle className="w-4 h-4" /> Proposal Shared
+                    </Label>
+                    <div className="text-white font-medium">-</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-slate-300">
+                      <ArrowRightCircle className="w-4 h-4" /> Quoted Value
+                    </Label>
+                    <div className="text-white font-medium">-</div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-slate-300">
+                      <ArrowRightCircle className="w-4 h-4" /> Deal Stage
+                    </Label>
+                    <div className="text-white font-medium">-</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-slate-300">
+                      <ArrowRightCircle className="w-4 h-4" /> Remarks
+                    </Label>
+                    <div className="text-white font-medium">-</div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2 text-slate-300">
+                      <ArrowRightCircle className="w-4 h-4" /> Management
+                    </Label>
+                    <div className="text-white font-medium">-</div>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex gap-3 pt-4">
                 <Button type="button" variant="outline" onClick={handleCancelDetails}>
                   <X className="w-4 h-4 mr-2" />
