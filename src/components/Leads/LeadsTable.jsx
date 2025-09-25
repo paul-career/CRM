@@ -972,12 +972,12 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         <Table>
           <TableHeader>
             <TableRow className="border-slate-700">
-              <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('leadName')}>Client Name {sortField === 'leadName' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
               <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('date')}>Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
+              <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('leadName')}>Client Name {sortField === 'leadName' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
               <TableHead className="text-slate-300">Contact</TableHead>
-              <TableHead className="text-slate-300">Company</TableHead>
-              <TableHead className="text-slate-300">Status</TableHead>
-              <TableHead className="text-slate-300">Assigned To</TableHead>
+              <TableHead className="text-slate-300">Requirements</TableHead>
+              <TableHead className="text-slate-300">Lead Status</TableHead>
+              <TableHead className="text-slate-300">Agent</TableHead>
               <TableHead className="text-slate-300 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -990,12 +990,12 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
                 transition={{ delay: index * 0.05 }}
                 className="border-slate-700 hover:bg-slate-800/30 transition-colors"
               >
+                <TableCell className="text-slate-300">{lead.date || 'N/A'}</TableCell>
                 <TableCell className="text-white font-medium">
                   <span className="inline-block">
                     {lead.leadName}
                   </span>
                 </TableCell>
-                <TableCell className="text-slate-300">{lead.date || 'N/A'}</TableCell>
                 <TableCell className="text-slate-300">{lead.contact}</TableCell>
                 <TableCell className="text-slate-300">{lead.company}</TableCell>
                 <TableCell>
