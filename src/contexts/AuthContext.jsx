@@ -12,11 +12,11 @@ export const useAuth = () => {
 };
 
 const initialUsers = [
-  { id: 1, email: 'admin@crm.com', password: 'admin123', role: 'admin', name: 'Admin User' },
-  { id: 2, email: 'sales@crm.com', password: 'sales123', role: 'sales', name: 'Sales Manager' },
-  { id: 3, email: 'user@crm.com', password: 'user123', role: 'user', name: 'Regular User' },
-  { id: 4, email: 'sales.agent1@crm.com', password: 'password', role: 'sales', name: 'Alice' },
-  { id: 5, email: 'sales.agent2@crm.com', password: 'password', role: 'user', name: 'Bob' }
+  { id: 1, email: 'admin@crm.com', password: 'admin123', role: 'super-admin', name: 'Super Admin User' },
+  { id: 2, email: 'lead@crm.com', password: 'lead123', role: 'lead', name: 'Lead Manager' },
+  { id: 3, email: 'agent@crm.com', password: 'agent123', role: 'agent', name: 'Regular Agent' },
+  { id: 4, email: 'lead.agent1@crm.com', password: 'password', role: 'lead', name: 'Alice' },
+  { id: 5, email: 'lead.agent2@crm.com', password: 'password', role: 'agent', name: 'Bob' }
 ];
 
 export const AuthProvider = ({ children }) => {
@@ -64,16 +64,16 @@ export const AuthProvider = ({ children }) => {
   };
   
   const getAssignableUsers = () => {
-    return users.filter(u => u.role === 'sales' || u.role === 'user');
+    return users.filter(u => u.role === 'lead' || u.role === 'agent');
   };
 
   const hasPermission = (permission) => {
     if (!user || !user.role) return false;
     
     const permissions = {
-      admin: ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'user-management', 'settings', 'import-leads'],
-      sales: ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'settings', 'import-leads'],
-      user: ['dashboard', 'leads']
+      'super-admin': ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'user-management', 'settings', 'import-leads'],
+      lead: ['dashboard', 'accounts', 'leads', 'meeting', 'finance', 'reports', 'settings', 'import-leads'],
+      agent: ['dashboard', 'leads']
     };
     
     const userPermissions = permissions[user.role];
