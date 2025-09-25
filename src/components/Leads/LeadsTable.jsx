@@ -11,9 +11,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import CallLogModal from './CallLogModal';
-import LeadDetailsModal from './LeadDetailsModal';
-import EditLeadModal from './EditLeadModal';
 import ImportLeadsModal from './ImportLeadsModal';
 import AssignLeadsModal from './AssignLeadsModal';
 
@@ -24,9 +21,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
   const [sortDirection, setSortDirection] = useState('asc');
   const [selectedLead, setSelectedLead] = useState(null);
   const [selectedLeads, setSelectedLeads] = useState([]);
-  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [isEditLeadModalOpen, setIsEditLeadModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -187,29 +181,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     toast({ title: `${newLeads.length} leads imported successfully!` });
   };
 
-  const handleCallLogSave = (callData) => {
-    const newCall = {
-      id: Date.now(),
-      date: callData.date,
-      notes: callData.notes,
-      nextFollowUp: callData.nextFollowUp,
-      type: 'call'
-    };
-
-    setLeads(leads.map(lead => 
-      lead.id === selectedLead.id 
-        ? { 
-            ...lead, 
-            callHistory: [...(lead.callHistory || []), newCall],
-            status: callData.status || lead.status
-          }
-        : lead
-    ));
-
-    toast({
-      title: "Call log saved successfully"
-    });
-  };
 
   const handleFormChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -1013,9 +984,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         <div className="text-center py-8"><p className="text-slate-400">No leads found</p></div>
       )}
 
-      <CallLogModal isOpen={isCallModalOpen} onClose={() => setIsCallModalOpen(false)} lead={selectedLead} onSave={handleCallLogSave} />
-      <LeadDetailsModal isOpen={isDetailsModalOpen} onClose={() => setIsDetailsModalOpen(false)} lead={selectedLead} />
-      <EditLeadModal isOpen={isEditLeadModalOpen} onClose={() => setIsEditLeadModalOpen(false)} lead={selectedLead} onSave={handleSaveLead} />
       <ImportLeadsModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} onImport={handleImportLeads} roundRobinEnabled={settings.roundRobin} />
       {canManageLeads && <AssignLeadsModal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} onAssign={handleManualAssign} />}
     </motion.div>
