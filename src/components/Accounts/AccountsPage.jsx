@@ -48,7 +48,9 @@ const AccountsPage = ({ accounts, setAccounts }) => {
 
   const handleEdit = (account) => {
     setSelectedAccount(account);
-    setIsDetailsModalOpen(true);
+    setDetailsFormData(account);
+    setShowDetailsView(true);
+    setIsEditingDetails(true); // Start in edit mode
   };
 
   const handleDelete = (accountId) => {
