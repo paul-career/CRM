@@ -51,9 +51,9 @@ const LoginPage = () => {
 
   const fillExampleCredentials = (role) => {
     const credentials = {
-      admin: { email: 'admin@crm.com', password: 'admin123' },
-      sales: { email: 'sales@crm.com', password: 'sales123' },
-      user: { email: 'user@crm.com', password: 'user123' }
+      'super-admin': { email: 'admin@crm.com', password: 'admin123' },
+      lead: { email: 'lead@crm.com', password: 'lead123' },
+      agent: { email: 'agent@crm.com', password: 'agent123' }
     };
     
     const cred = credentials[role];
@@ -149,9 +149,9 @@ const LoginPage = () => {
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 border-slate-600">
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="sales">Sales Team</SelectItem>
-                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="super-admin">Super Admin</SelectItem>
+                    <SelectItem value="lead">Lead</SelectItem>
+                    <SelectItem value="agent">Agent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -221,28 +221,28 @@ const LoginPage = () => {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => fillExampleCredentials('admin')}
+                  onClick={() => fillExampleCredentials('super-admin')}
                   className="text-xs border-slate-600 text-slate-300 hover:bg-slate-700"
                 >
-                  Admin
+                  Super Admin
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => fillExampleCredentials('sales')}
+                  onClick={() => fillExampleCredentials('lead')}
                   className="text-xs border-slate-600 text-slate-300 hover:bg-slate-700"
                 >
-                  Sales
+                  Lead
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => fillExampleCredentials('user')}
+                  onClick={() => fillExampleCredentials('agent')}
                   className="text-xs border-slate-600 text-slate-300 hover:bg-slate-700"
                 >
-                  User
+                  Agent
                 </Button>
               </div>
             </div>
