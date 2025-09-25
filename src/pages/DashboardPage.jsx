@@ -191,21 +191,21 @@ const DashboardPage = () => {
   const getPageTitleAndDescription = () => {
     switch (activeSection) {
       case 'accounts':
-        return { title: 'Clients - CRM', description: 'Manage your clients and customer relationships.' };
+        return { title: 'Clients - Call 360', description: 'Manage your clients and customer relationships.' };
       case 'leads':
-        return { title: 'Leads - CRM', description: 'Track and manage sales leads.' };
+        return { title: 'Leads - Call 360', description: 'Track and manage sales leads.' };
       case 'meeting':
-        return { title: 'Meeting Fixed - CRM', description: 'Manage your meetings and appointments.' };
+        return { title: 'Meeting Fixed - Call 360', description: 'Manage your meetings and appointments.' };
       case 'finance':
-        return { title: 'Finance - CRM', description: 'View financial data and reports.' };
+        return { title: 'Finance - Call 360', description: 'View financial data and reports.' };
       case 'reports':
-        return { title: 'Reports - CRM', description: 'Generate and view detailed reports.' };
+        return { title: 'Reports - Call 360', description: 'Generate and view detailed reports.' };
       case 'user-management':
-        return { title: 'User Management - CRM', description: 'Manage users and their roles.' };
+        return { title: 'User Management - Call 360', description: 'Manage users and their roles.' };
       case 'settings':
-        return { title: 'Settings - CRM', description: 'Configure application settings.' };
+        return { title: 'Settings - Call 360', description: 'Configure application settings.' };
       default:
-        return { title: 'Dashboard - CRM', description: 'CRM dashboard with key statistics.' };
+        return { title: 'Dashboard - Call 360', description: 'Call 360 dashboard with key statistics.' };
     }
   };
 
