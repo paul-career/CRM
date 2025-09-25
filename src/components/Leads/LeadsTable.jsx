@@ -170,7 +170,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
       company: '',
       contact: '',
       email: '',
-      source: '',
+      date: '',
       status: 'not-started',
       notes: ''
     });
@@ -184,7 +184,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
       company: '',
       contact: '',
       email: '',
-      source: '',
+      date: '',
       status: 'not-started',
       notes: ''
     });
