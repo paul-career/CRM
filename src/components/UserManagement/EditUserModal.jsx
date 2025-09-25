@@ -61,11 +61,11 @@ const EditUserModal = ({ isOpen, onClose, user, onSave }) => {
                             <SelectTrigger className="bg-slate-800/50 border-slate-600 text-white">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-slate-600">
-                                <SelectItem value="user">User</SelectItem>
-                                <SelectItem value="sales">Sales</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
+                                <SelectContent className="bg-slate-800 border-slate-600">
+                                    <SelectItem value="agent">Agent</SelectItem>
+                                    <SelectItem value="lead">Lead</SelectItem>
+                                    <SelectItem value="super-admin">Super Admin</SelectItem>
+                                </SelectContent>
                         </Select>
                     </div>
                 </motion.div>
