@@ -267,19 +267,12 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
   };
 
   const handleSaveCall = () => {
-    if (!callFormData.notes) {
-      toast({
-        title: "Please add call notes",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    // For the Virtual Call dialog, we'll just log a simple call
     const newCall = {
       id: Date.now(),
-      date: callFormData.date,
-      notes: callFormData.notes,
-      nextFollowUp: callFormData.nextFollowUp,
+      date: new Date().toISOString().split('T')[0],
+      notes: `Virtual call initiated with ${selectedLead.leadName}`,
+      nextFollowUp: '',
       type: 'call'
     };
 
@@ -288,7 +281,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         ? { 
             ...lead, 
             callHistory: [...(lead.callHistory || []), newCall],
-            status: callFormData.status || lead.status
+            status: 'in-progress'
           }
         : lead
     ));
@@ -301,7 +294,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
       nextFollowUp: '',
       status: ''
     });
-    toast({ title: "Call log saved successfully" });
+    toast({ title: "Call initiated successfully" });
   };
 
   const handleCancelCall = () => {
@@ -720,89 +713,79 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         </motion.div>
       )}
 
-      {/* Call Log View */}
+      {/* Virtual Call Dialog */}
       {showCallView && selectedLead && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6"
         >
-          <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700">
-            <div className="mb-6">
-              <span className="text-xl font-bold text-white">Call Log - {selectedLead.leadName}</span>
+          <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700 max-w-md mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <Phone className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-xl font-bold text-white">Virtual Call</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleCancelCall}
+                className="text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
             
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="call-date" className="flex items-center gap-2 text-slate-300">
-                    <FileText className="w-4 h-4" /> Call Date
-                  </Label>
-                  <Input
-                    id="call-date"
-                    type="date"
-                    value={callFormData.date}
-                    onChange={(e) => handleCallFormChange('date', e.target.value)}
-                    className="bg-slate-800/50 border-slate-600 text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-slate-300">Update Status</Label>
-                  <Select
-                    value={callFormData.status}
-                    onValueChange={(value) => handleCallFormChange('status', value)}
-                  >
-                    <SelectTrigger className="bg-slate-800/50 border-slate-600 text-white">
-                      <SelectValue placeholder="Keep current status" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-600">
-                      <SelectItem value="">Keep current status</SelectItem>
-                      <SelectItem value="not-started">Not Started</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="follow-up">Follow Up</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="text-center space-y-4">
+              {/* Contact Avatar */}
+              <div className="w-20 h-20 bg-purple-500 rounded-full mx-auto flex items-center justify-center">
+                <span className="text-2xl font-bold text-white">
+                  {selectedLead.leadName?.charAt(0) || 'A'}
+                </span>
               </div>
-
+              
+              {/* Contact Info */}
+              <div>
+                <h3 className="text-xl font-bold text-white">{selectedLead.leadName}</h3>
+                <p className="text-slate-400">{selectedLead.company}</p>
+              </div>
+              
+              {/* Call Details */}
               <div className="space-y-2">
-                <Label htmlFor="call-notes" className="flex items-center gap-2 text-slate-300">
-                  <FileText className="w-4 h-4" /> Call Notes *
-                </Label>
-                <Textarea
-                  id="call-notes"
-                  placeholder="Enter call details and outcomes..."
-                  value={callFormData.notes}
-                  onChange={(e) => handleCallFormChange('notes', e.target.value)}
-                  className="bg-slate-800/50 border-slate-600 text-white"
-                  rows={4}
-                />
+                <p className="text-slate-300">Ready to call?</p>
+                <p className="text-slate-400 text-sm">Virtual Number: +1-555-CRM-PRO</p>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="next-followup" className="flex items-center gap-2 text-slate-300">
-                  <ArrowRightCircle className="w-4 h-4" /> Next Follow-up
-                </Label>
-                <Input
-                  id="next-followup"
-                  placeholder="e.g., Call back in 3 days, Send proposal..."
-                  value={callFormData.nextFollowUp}
-                  onChange={(e) => handleCallFormChange('nextFollowUp', e.target.value)}
-                  className="bg-slate-800/50 border-slate-600 text-white"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={handleCancelCall}>
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel
-                </Button>
-                <Button onClick={handleSaveCall} className="bg-gradient-to-r from-green-500 to-blue-500">
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Call Log
-                </Button>
-              </div>
+              
+              {/* Call Button */}
+              <Button 
+                onClick={handleSaveCall} 
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-3"
+              >
+                <Phone className="w-5 h-5 mr-2" />
+                Call {selectedLead.contact || '+1 (555) 111-2222'}
+              </Button>
+              
+              {/* Manual Log Option */}
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  setShowCallView(false);
+                  // Open manual call log form
+                  setCallFormData({
+                    date: new Date().toISOString().split('T')[0],
+                    notes: '',
+                    nextFollowUp: '',
+                    status: selectedLead.status
+                  });
+                  setShowCallView(true);
+                }}
+                className="text-blue-400 hover:text-blue-300 text-sm"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Log call details manually
+              </Button>
             </div>
           </div>
         </motion.div>
