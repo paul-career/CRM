@@ -46,7 +46,7 @@ const Sidebar = ({ activeSection, setActiveSection, isOpen, setIsOpen }) => {
           <div className="w-8 h-8 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
             <span className="text-white font-bold text-lg">C</span>
           </div>
-          <span className="text-xl font-bold text-white">CRM</span>
+          <span className="text-xl font-bold text-white">Call 360</span>
         </div>
         <Button variant="ghost" size="icon" className="lg:hidden text-slate-400" onClick={() => setIsOpen(false)}>
           <X className="w-6 h-6" />
