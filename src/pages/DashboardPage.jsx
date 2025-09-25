@@ -26,6 +26,23 @@ const DashboardPage = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [accounts, setAccounts] = useLocalStorage('crmAccounts', sampleClients || []);
   const [leads, setLeads] = useLocalStorage('crmLeads', sampleLeads || []);
+  
+  // Migration: Convert old leads with 'source' field to 'date' field
+  useEffect(() => {
+    const needsMigration = leads.some(lead => lead.source && !lead.date);
+    if (needsMigration) {
+      const migratedLeads = leads.map(lead => {
+        if (lead.source && !lead.date) {
+          // Generate a random date for existing leads
+          const randomDates = ['2024-12-15', '2024-11-28', '2024-10-22', '2024-09-14', '2024-08-07'];
+          const randomDate = randomDates[Math.floor(Math.random() * randomDates.length)];
+          return { ...lead, date: randomDate, source: undefined };
+        }
+        return lead;
+      });
+      setLeads(migratedLeads);
+    }
+  }, [leads, setLeads]);
   const [meetings, setMeetings] = useLocalStorage('crmMeetings', []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
