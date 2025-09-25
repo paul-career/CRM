@@ -46,7 +46,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
   
   const [settings] = useLocalStorage('crmSettings', { roundRobin: true });
 
-  const canManageLeads = user.role === 'admin' || user.role === 'sales';
+  const canManageLeads = user.role === 'super-admin' || user.role === 'lead';
   const canImportLeads = hasPermission('import-leads');
 
   const filteredLeads = useMemo(() => {
