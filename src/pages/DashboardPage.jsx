@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import { useSearchParams } from 'react-router-dom';
 import { Menu, RotateCcw } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { sampleClients, sampleLeads } from '@/data/sampleData';
@@ -132,35 +133,51 @@ const DashboardPage = () => {
       case 'meeting':
         return hasPermission('meeting') ? (
           <div className="glass-effect rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Completed leads and meetings</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">Completed leads and meetings</h2>
             
             {meetings.length > 0 ? (
               <div className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {meetings.map((meeting) => (
-                    <div key={meeting.id} className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-white font-semibold">{meeting.leadName}</h3>
-                        <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded-full text-xs">
-                          Completed
-                        </span>
-                      </div>
-                      <p className="text-slate-300 text-sm mb-1">{meeting.company}</p>
-                      <p className="text-slate-400 text-xs mb-2">{meeting.contact}</p>
-                      <p className="text-slate-400 text-xs mb-3">
-                        Completed: {new Date(meeting.completedAt).toLocaleDateString()}
-                      </p>
-                      <Button
-                        onClick={() => handleReopenMeeting(meeting.id)}
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-slate-300 border-slate-600 hover:bg-slate-700 hover:text-white"
-                      >
-                        <RotateCcw className="w-4 h-4 mr-2" />
-                        Reopen
-                      </Button>
-                    </div>
-                  ))}
+                <div className="rounded-lg border border-slate-700 overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-700">
+                        <TableHead className="text-slate-300">Date</TableHead>
+                        <TableHead className="text-slate-300">Client Name</TableHead>
+                        <TableHead className="text-slate-300">Contact</TableHead>
+                        <TableHead className="text-slate-300">Requirements</TableHead>
+                        <TableHead className="text-slate-300">Completed Date</TableHead>
+                        <TableHead className="text-slate-300">Agent</TableHead>
+                        <TableHead className="text-slate-300 text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {meetings.map((meeting) => (
+                        <TableRow key={meeting.id} className="border-slate-700 hover:bg-slate-800/30">
+                          <TableCell className="text-slate-300">{meeting.date || 'N/A'}</TableCell>
+                          <TableCell className="text-white font-medium">
+                            {meeting.leadName}
+                          </TableCell>
+                          <TableCell className="text-slate-300">{meeting.contact}</TableCell>
+                          <TableCell className="text-slate-300">{meeting.company}</TableCell>
+                          <TableCell className="text-slate-300">
+                            {new Date(meeting.completedAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-slate-300">{meeting.assignedTo}</TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              onClick={() => handleReopenMeeting(meeting.id)}
+                              variant="outline"
+                              size="sm"
+                              className="text-slate-300 border-slate-600 hover:bg-slate-700 hover:text-white"
+                            >
+                              <RotateCcw className="w-4 h-4 mr-2" />
+                              Reopen
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             ) : (
