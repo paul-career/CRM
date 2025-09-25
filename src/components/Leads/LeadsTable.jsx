@@ -28,7 +28,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     company: '',
     contact: '',
     email: '',
-    source: '',
+    date: '',
     status: 'not-started',
     notes: ''
   });
@@ -61,7 +61,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         const matchesSearch = 
           (lead.leadName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
           (lead.company || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (lead.source || '').toLowerCase().includes(searchTerm.toLowerCase());
+          (lead.date || '').toLowerCase().includes(searchTerm.toLowerCase());
         
         const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
         
@@ -491,14 +491,14 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="source" className="flex items-center gap-2 text-slate-300">
-                  <ArrowRightCircle className="w-4 h-4" /> Source
+                <Label htmlFor="date" className="flex items-center gap-2 text-slate-300">
+                  <ArrowRightCircle className="w-4 h-4" /> Date
                 </Label>
                 <Input
-                  id="source"
-                  placeholder="e.g., Website, LinkedIn, Referral"
-                  value={formData.source}
-                  onChange={(e) => handleFormChange('source', e.target.value)}
+                  id="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => handleFormChange('date', e.target.value)}
                   className="bg-slate-800/50 border-slate-600 text-white"
                 />
               </div>
@@ -593,7 +593,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
 
               <div className="space-y-2">
                 <Label className="flex items-center gap-2 text-slate-300">
-                  <ArrowRightCircle className="w-4 h-4" /> Source
+                  <ArrowRightCircle className="w-4 h-4" /> Date
                 </Label>
                 <div className="text-white font-medium">{detailsFormData.source}</div>
               </div>
@@ -701,14 +701,14 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-source" className="flex items-center gap-2 text-slate-300">
-                  <ArrowRightCircle className="w-4 h-4" /> Source
+                <Label htmlFor="edit-date" className="flex items-center gap-2 text-slate-300">
+                  <ArrowRightCircle className="w-4 h-4" /> Date
                 </Label>
                 <Input
-                  id="edit-source"
-                  placeholder="e.g., Website, LinkedIn, Referral"
-                  value={detailsFormData.source || ''}
-                  onChange={(e) => handleDetailsFormChange('source', e.target.value)}
+                  id="edit-date"
+                  type="date"
+                  value={detailsFormData.date || ''}
+                  onChange={(e) => handleDetailsFormChange('date', e.target.value)}
                   className="bg-slate-800/50 border-slate-600 text-white"
                 />
               </div>
@@ -972,8 +972,8 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         <Table>
           <TableHeader>
             <TableRow className="border-slate-700">
-              <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('leadName')}>Lead Name {sortField === 'leadName' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
-              <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('source')}>Source {sortField === 'source' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
+              <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('leadName')}>Client Name {sortField === 'leadName' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
+              <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('date')}>Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
               <TableHead className="text-slate-300">Contact</TableHead>
               <TableHead className="text-slate-300">Company</TableHead>
               <TableHead className="text-slate-300">Status</TableHead>
@@ -995,7 +995,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
                     {lead.leadName}
                   </span>
                 </TableCell>
-                <TableCell className="text-slate-300">{lead.source}</TableCell>
+                <TableCell className="text-slate-300">{lead.date || 'N/A'}</TableCell>
                 <TableCell className="text-slate-300">{lead.contact}</TableCell>
                 <TableCell className="text-slate-300">{lead.company}</TableCell>
                 <TableCell>
@@ -1059,6 +1059,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
               </Select>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-700/50 space-y-2 text-sm">
+              <p className="text-slate-300"><strong>Date:</strong> {lead.date || 'N/A'}</p>
               <p className="text-slate-300"><strong>Contact:</strong> {lead.contact}</p>
               <p className="text-slate-300"><strong>Assigned:</strong> {lead.assignedTo}</p>
             </div>
