@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Edit, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const AccountsTable = ({ accounts, onEdit, onView, onDelete }) => {
   const [sortField, setSortField] = useState('name');
@@ -40,7 +39,6 @@ const AccountsTable = ({ accounts, onEdit, onView, onDelete }) => {
     );
   };
   
-  const generateAvatarUrl = (seed) => `https://api.dicebear.com/7.x/pixel-art/svg?seed=${seed}`;
 
   return (
     <div className="overflow-x-auto">
@@ -70,11 +68,7 @@ const AccountsTable = ({ accounts, onEdit, onView, onDelete }) => {
               transition={{ delay: index * 0.05 }}
               className="border-slate-700 hover:bg-slate-800/30 transition-colors"
             >
-              <TableCell className="text-white font-medium flex items-center gap-3">
-                 <Avatar>
-                    <AvatarImage src={generateAvatarUrl(account.name)} alt={account.name} />
-                    <AvatarFallback>{account.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+              <TableCell className="text-white font-medium">
                 {account.name}
               </TableCell>
               <TableCell className="text-slate-300">{account.company}</TableCell>
