@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Plus, LayoutGrid, List, User, Shield, Phone, Mail, MapPin, Save, X, ArrowLeft } from 'lucide-react';
+import { Search, Plus, LayoutGrid, List, User, Shield, Phone, Mail, MapPin, Save, X, ArrowLeft, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/components/ui/use-toast';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AccountsTable from './AccountsTable';
@@ -17,6 +18,9 @@ const AccountsPage = ({ accounts, setAccounts }) => {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDetailsView, setShowDetailsView] = useState(false);
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [detailsFormData, setDetailsFormData] = useState({});
   const [formData, setFormData] = useState({
     name: '',
     company: '',
@@ -33,9 +37,13 @@ const AccountsPage = ({ accounts, setAccounts }) => {
     (account.email && account.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const generateAvatarUrl = (seed) => `https://api.dicebear.com/7.x/pixel-art/svg?seed=${seed}`;
+
   const handleView = (account) => {
     setSelectedAccount(account);
-    setIsDetailsModalOpen(true);
+    setDetailsFormData(account);
+    setShowDetailsView(true);
+    setIsEditingDetails(false);
   };
 
   const handleEdit = (account) => {
@@ -97,6 +105,23 @@ const AccountsPage = ({ accounts, setAccounts }) => {
     });
   };
 
+  const handleDetailsFormChange = (field, value) => {
+    setDetailsFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveDetails = () => {
+    setAccounts(accounts.map(c => c.id === detailsFormData.id ? detailsFormData : c));
+    setIsEditingDetails(false);
+    toast({ title: "Client details saved successfully" });
+  };
+
+  const handleCancelDetails = () => {
+    setShowDetailsView(false);
+    setSelectedAccount(null);
+    setDetailsFormData({});
+    setIsEditingDetails(false);
+  };
+
 
   return (
     <motion.div
@@ -107,11 +132,11 @@ const AccountsPage = ({ accounts, setAccounts }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex items-center gap-3">
-          {showAddForm && (
+          {(showAddForm || showDetailsView) && (
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={handleCancelAdd}
+              onClick={showAddForm ? handleCancelAdd : handleCancelDetails}
               className="text-slate-400 hover:text-white"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -129,15 +154,15 @@ const AccountsPage = ({ accounts, setAccounts }) => {
             </svg>
           </div>
           <span className="text-2xl font-bold text-white">
-            {showAddForm ? 'Add New Client' : 'Clients'}
+            {showAddForm ? 'Add New Client' : showDetailsView ? 'Client Details' : 'Clients'}
           </span>
         </div>
-        {!showAddForm && (
-          <div className="flex gap-3">
+        {!showAddForm && !showDetailsView && (
+        <div className="flex gap-3">
             <Button onClick={() => setShowAddForm(true)} className="flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Add Client
-            </Button>
-          </div>
+            <Plus className="w-4 h-4" /> Add Client
+          </Button>
+        </div>
         )}
       </div>
 
@@ -255,50 +280,173 @@ const AccountsPage = ({ accounts, setAccounts }) => {
         </motion.div>
       )}
 
-      {/* Search and View Toggle - Only show when not in add form mode */}
-      {!showAddForm && (
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-            <Input
-              placeholder="Search clients..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-slate-800/50 border-slate-600 text-white placeholder-slate-400"
-            />
+      {/* Client Details View */}
+      {showDetailsView && selectedAccount && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700">
+            <div className="flex items-center gap-3 mb-6">
+              <Avatar>
+                <AvatarImage src={generateAvatarUrl(detailsFormData.name)} alt={detailsFormData.name} />
+                <AvatarFallback>{detailsFormData.name?.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <span className="text-xl font-bold text-white">Client Details</span>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="details-name" className="flex items-center gap-2 text-slate-300">
+                  <User className="w-4 h-4" /> Client Name
+                </Label>
+                <Input
+                  id="details-name"
+                  value={detailsFormData.name || ''}
+                  onChange={(e) => handleDetailsFormChange('name', e.target.value)}
+                  readOnly={!isEditingDetails}
+                  className="bg-slate-800/50 border-slate-600 text-white read-only:bg-slate-800/30"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="details-company" className="flex items-center gap-2 text-slate-300">
+                  <Shield className="w-4 h-4" /> Company
+                </Label>
+                <Input
+                  id="details-company"
+                  value={detailsFormData.company || ''}
+                  onChange={(e) => handleDetailsFormChange('company', e.target.value)}
+                  readOnly={!isEditingDetails}
+                  className="bg-slate-800/50 border-slate-600 text-white read-only:bg-slate-800/30"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="details-contact" className="flex items-center gap-2 text-slate-300">
+                  <Phone className="w-4 h-4" /> Phone
+                </Label>
+                <Input
+                  id="details-contact"
+                  value={detailsFormData.contact || ''}
+                  onChange={(e) => handleDetailsFormChange('contact', e.target.value)}
+                  readOnly={!isEditingDetails}
+                  className="bg-slate-800/50 border-slate-600 text-white read-only:bg-slate-800/30"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="details-email" className="flex items-center gap-2 text-slate-300">
+                  <Mail className="w-4 h-4" /> Email
+                </Label>
+                <Input
+                  id="details-email"
+                  type="email"
+                  value={detailsFormData.email || ''}
+                  onChange={(e) => handleDetailsFormChange('email', e.target.value)}
+                  readOnly={!isEditingDetails}
+                  className="bg-slate-800/50 border-slate-600 text-white read-only:bg-slate-800/30"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="details-location" className="flex items-center gap-2 text-slate-300">
+                  <MapPin className="w-4 h-4" /> Location
+                </Label>
+                <Input
+                  id="details-location"
+                  value={detailsFormData.location || ''}
+                  onChange={(e) => handleDetailsFormChange('location', e.target.value)}
+                  readOnly={!isEditingDetails}
+                  className="bg-slate-800/50 border-slate-600 text-white read-only:bg-slate-800/30"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-slate-300">Status</Label>
+                <Select
+                  value={detailsFormData.status || 'active'}
+                  onValueChange={(value) => handleDetailsFormChange('status', value)}
+                  disabled={!isEditingDetails}
+                >
+                  <SelectTrigger className="bg-slate-800/50 border-slate-600 text-white disabled:bg-slate-800/30 disabled:opacity-100">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={handleCancelDetails}>
+                  <X className="w-4 h-4 mr-2" />
+                  Close
+                </Button>
+                {isEditingDetails ? (
+                  <Button onClick={handleSaveDetails} className="bg-gradient-to-r from-green-500 to-blue-500">
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </Button>
+                ) : (
+                  <Button onClick={() => setIsEditingDetails(true)}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
-          <Tabs value={viewMode} onValueChange={setViewMode} className="w-full sm:w-auto">
-            <TabsList className="bg-slate-800/50 border border-slate-700">
-              <TabsTrigger value="table" className="flex items-center gap-2">
-                <List className="w-4 h-4" /> Table
-              </TabsTrigger>
-              <TabsTrigger value="kanban" className="flex items-center gap-2">
-                <LayoutGrid className="w-4 h-4" /> Kanban
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+        </motion.div>
+      )}
+
+      {/* Search and View Toggle - Only show when not in add form mode */}
+      {!showAddForm && !showDetailsView && (
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+          <Input
+            placeholder="Search clients..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-slate-800/50 border-slate-600 text-white placeholder-slate-400"
+          />
         </div>
+        <Tabs value={viewMode} onValueChange={setViewMode} className="w-full sm:w-auto">
+          <TabsList className="bg-slate-800/50 border border-slate-700">
+            <TabsTrigger value="table" className="flex items-center gap-2">
+              <List className="w-4 h-4" /> Table
+            </TabsTrigger>
+            <TabsTrigger value="kanban" className="flex items-center gap-2">
+              <LayoutGrid className="w-4 h-4" /> Kanban
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
       )}
 
       {/* Content - Only show when not in add form mode */}
-      {!showAddForm && (
-        <div>
-          {viewMode === 'table' ? (
-            <AccountsTable
-              accounts={filteredAccounts}
-              onEdit={handleEdit}
-              onView={handleView}
-              onDelete={handleDelete}
-            />
-          ) : (
-            <AccountsKanban
-              accounts={filteredAccounts}
-              onEdit={handleEdit}
-              onView={handleView}
-              onDelete={handleDelete}
-            />
-          )}
-        </div>
+      {!showAddForm && !showDetailsView && (
+      <div>
+        {viewMode === 'table' ? (
+          <AccountsTable
+            accounts={filteredAccounts}
+            onEdit={handleEdit}
+            onView={handleView}
+            onDelete={handleDelete}
+          />
+        ) : (
+          <AccountsKanban
+            accounts={filteredAccounts}
+            onEdit={handleEdit}
+            onView={handleView}
+            onDelete={handleDelete}
+          />
+        )}
+      </div>
       )}
 
       <AccountDetailsModal
