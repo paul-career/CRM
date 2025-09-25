@@ -1,17 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Eye, Phone, Plus, Upload, Filter, UserPlus, Edit, User, Building, Mail, ArrowRightCircle, FileText, Save, X, ArrowLeft } from 'lucide-react';
+import { Search, Eye, Phone, Plus, Upload, Filter, Edit, User, Building, Mail, ArrowRightCircle, FileText, Save, X, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import AssignLeadsModal from './AssignLeadsModal';
 
 const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,8 +17,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
   const [sortField, setSortField] = useState('leadName');
   const [sortDirection, setSortDirection] = useState('asc');
   const [selectedLead, setSelectedLead] = useState(null);
-  const [selectedLeads, setSelectedLeads] = useState([]);
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDetailsView, setShowDetailsView] = useState(false);
   const [showCallView, setShowCallView] = useState(false);
@@ -88,20 +84,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     }
   };
 
-  const handleSelectLead = (leadId) => {
-    setSelectedLeads(prev => 
-      prev.includes(leadId) ? prev.filter(id => id !== leadId) : [...prev, leadId]
-    );
-  };
-  
-  const handleSelectAll = (e) => {
-    const isChecked = e.target.checked;
-    if (isChecked) {
-      setSelectedLeads(filteredLeads.map(lead => lead.id));
-    } else {
-      setSelectedLeads([]);
-    }
-  };
 
   const handleViewDetails = (lead) => {
     setSelectedLead(lead);
@@ -128,25 +110,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     setShowCallView(true);
   };
   
-  const handleOpenAssignModal = () => {
-    if (selectedLeads.length === 0) {
-      toast({
-        title: "No leads selected",
-        description: "Please select leads to assign.",
-        variant: "destructive"
-      });
-      return;
-    }
-    setIsAssignModalOpen(true);
-  };
-  
-  const handleManualAssign = (userId) => {
-    setLeads(currentLeads => currentLeads.map(lead =>
-      selectedLeads.includes(lead.id) ? { ...lead, assignedTo: userId } : lead
-    ));
-    toast({ title: `${selectedLeads.length} leads assigned successfully!` });
-    setSelectedLeads([]);
-  };
 
   const handleStatusUpdate = (leadId, newStatus) => {
     if (onLeadStatusChange) {
@@ -1000,11 +963,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
               <SelectItem value="follow-up">Follow Up</SelectItem>
             </SelectContent>
           </Select>
-          {canManageLeads && (
-            <Button onClick={handleOpenAssignModal} disabled={selectedLeads.length === 0} className="flex items-center gap-2">
-              <UserPlus className="w-4 h-4" /> Assign ({selectedLeads.length})
-            </Button>
-          )}
         </div>
       )}
 
@@ -1014,14 +972,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         <Table>
           <TableHeader>
             <TableRow className="border-slate-700">
-              {canManageLeads && (
-                <TableHead className="w-12">
-                  <Checkbox 
-                    checked={filteredLeads.length > 0 && selectedLeads.length === filteredLeads.length}
-                    onCheckedChange={(checked) => handleSelectAll({ target: { checked: checked } })}
-                  />
-                </TableHead>
-              )}
               <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('leadName')}>Lead Name {sortField === 'leadName' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
               <TableHead className="text-slate-300 cursor-pointer hover:text-white" onClick={() => handleSort('source')}>Source {sortField === 'source' && (sortDirection === 'asc' ? '↑' : '↓')}</TableHead>
               <TableHead className="text-slate-300">Contact</TableHead>
@@ -1038,16 +988,8 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className={`border-slate-700 transition-colors ${selectedLeads.includes(lead.id) ? 'bg-blue-900/50' : 'hover:bg-slate-800/30'}`}
+                className="border-slate-700 hover:bg-slate-800/30 transition-colors"
               >
-                {canManageLeads && (
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedLeads.includes(lead.id)}
-                      onCheckedChange={() => handleSelectLead(lead.id)}
-                    />
-                  </TableCell>
-                )}
                 <TableCell className="text-white font-medium">
                   <span className="inline-block">
                     {lead.leadName}
@@ -1087,33 +1029,16 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
       {/* Mobile Card View - Only show when not in any form mode */}
       {!showAddForm && !showDetailsView && !showCallView && !showEditView && !showImportForm && (
         <div className="grid grid-cols-1 gap-4 md:hidden">
-        {canManageLeads && (
-          <div className="flex items-center p-2">
-            <Checkbox 
-              id="select-all-mobile"
-              checked={filteredLeads.length > 0 && selectedLeads.length === filteredLeads.length}
-              onCheckedChange={(checked) => handleSelectAll({ target: { checked: checked } })}
-            />
-            <label htmlFor="select-all-mobile" className="ml-3 text-sm text-slate-300">Select All</label>
-          </div>
-        )}
         {filteredLeads.map((lead, index) => (
           <motion.div
             key={lead.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className={`p-4 rounded-lg transition-colors ${selectedLeads.includes(lead.id) ? 'bg-blue-900/50' : 'bg-slate-800/30'} border border-slate-700`}
+            className="p-4 rounded-lg transition-colors bg-slate-800/30 border border-slate-700"
           >
             <div className="flex justify-between items-start">
               <div className="flex items-start gap-3">
-                {canManageLeads && (
-                  <Checkbox
-                    className="mt-1"
-                    checked={selectedLeads.includes(lead.id)}
-                    onCheckedChange={() => handleSelectLead(lead.id)}
-                  />
-                )}
                 <div>
                   <span className="font-bold text-white">
                     {lead.leadName}
@@ -1151,7 +1076,6 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         <div className="text-center py-8"><p className="text-slate-400">No leads found</p></div>
       )}
 
-      {canManageLeads && <AssignLeadsModal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} onAssign={handleManualAssign} />}
     </motion.div>
   );
 };
