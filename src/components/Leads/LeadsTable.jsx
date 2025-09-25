@@ -30,6 +30,10 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDetailsView, setShowDetailsView] = useState(false);
+  const [showCallView, setShowCallView] = useState(false);
+  const [showEditView, setShowEditView] = useState(false);
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
   const [formData, setFormData] = useState({
     leadName: '',
     company: '',
@@ -38,6 +42,13 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     source: '',
     status: 'not-started',
     notes: ''
+  });
+  const [detailsFormData, setDetailsFormData] = useState({});
+  const [callFormData, setCallFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    notes: '',
+    nextFollowUp: '',
+    status: ''
   });
   const { toast } = useToast();
   const { user, hasPermission } = useAuth();
@@ -99,17 +110,27 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
 
   const handleViewDetails = (lead) => {
     setSelectedLead(lead);
-    setIsDetailsModalOpen(true);
+    setDetailsFormData(lead);
+    setShowDetailsView(true);
+    setIsEditingDetails(false);
   };
   
   const handleEditLead = (lead) => {
     setSelectedLead(lead);
-    setIsEditLeadModalOpen(true);
+    setDetailsFormData(lead);
+    setShowEditView(true);
+    setIsEditingDetails(true);
   };
 
   const handleCallCustomer = (lead) => {
     setSelectedLead(lead);
-    setIsCallModalOpen(true);
+    setCallFormData({
+      date: new Date().toISOString().split('T')[0],
+      notes: '',
+      nextFollowUp: '',
+      status: lead.status
+    });
+    setShowCallView(true);
   };
   
   const handleOpenAssignModal = () => {
@@ -238,6 +259,91 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     });
   };
 
+  const handleDetailsFormChange = (field, value) => {
+    setDetailsFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveDetails = () => {
+    if (!detailsFormData.leadName || !detailsFormData.company || !detailsFormData.email) {
+      toast({
+        title: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLeads(leads.map(lead => 
+      lead.id === selectedLead.id ? { ...lead, ...detailsFormData } : lead
+    ));
+    
+    setShowEditView(false);
+    setShowDetailsView(false);
+    setSelectedLead(null);
+    setDetailsFormData({});
+    toast({ title: "Lead updated successfully" });
+  };
+
+  const handleCancelDetails = () => {
+    setShowDetailsView(false);
+    setShowEditView(false);
+    setSelectedLead(null);
+    setDetailsFormData({});
+    setIsEditingDetails(false);
+  };
+
+  const handleCallFormChange = (field, value) => {
+    setCallFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveCall = () => {
+    if (!callFormData.notes) {
+      toast({
+        title: "Please add call notes",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newCall = {
+      id: Date.now(),
+      date: callFormData.date,
+      notes: callFormData.notes,
+      nextFollowUp: callFormData.nextFollowUp,
+      type: 'call'
+    };
+
+    setLeads(leads.map(lead => 
+      lead.id === selectedLead.id 
+        ? { 
+            ...lead, 
+            callHistory: [...(lead.callHistory || []), newCall],
+            status: callFormData.status || lead.status
+          }
+        : lead
+    ));
+
+    setShowCallView(false);
+    setSelectedLead(null);
+    setCallFormData({
+      date: new Date().toISOString().split('T')[0],
+      notes: '',
+      nextFollowUp: '',
+      status: ''
+    });
+    toast({ title: "Call log saved successfully" });
+  };
+
+  const handleCancelCall = () => {
+    setShowCallView(false);
+    setSelectedLead(null);
+    setCallFormData({
+      date: new Date().toISOString().split('T')[0],
+      notes: '',
+      nextFollowUp: '',
+      status: ''
+    });
+  };
+
   const getStatusBadge = (status) => {
     const statusClasses = {
       'not-started': 'status-badge status-not-started',
@@ -269,22 +375,29 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex items-center gap-3">
-          {showAddForm && (
+          {(showAddForm || showDetailsView || showCallView || showEditView) && (
             <Button 
               variant="ghost" 
               size="icon" 
-              onClick={handleCancelAdd}
+              onClick={() => {
+                if (showAddForm) handleCancelAdd();
+                if (showDetailsView || showEditView) handleCancelDetails();
+                if (showCallView) handleCancelCall();
+              }}
               className="text-slate-400 hover:text-white"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
           )}
           <span className="text-2xl font-bold text-white">
-            {showAddForm ? 'Add New Lead' : 'Your Leads'}
+            {showAddForm ? 'Add New Lead' : 
+             showDetailsView ? 'Lead Details' :
+             showCallView ? 'Call Log' :
+             showEditView ? 'Edit Lead' : 'Your Leads'}
           </span>
         </div>
         
-        {!showAddForm && (
+        {!showAddForm && !showDetailsView && !showCallView && !showEditView && (
           <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
             {canImportLeads && (
               <Button onClick={() => setIsImportModalOpen(true)} variant="outline" className="flex-1 sm:flex-none flex items-center gap-2">
@@ -425,8 +538,307 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         </motion.div>
       )}
 
-      {/* Search and Filter - Only show when not in add form mode */}
-      {!showAddForm && (
+      {/* Lead Details View */}
+      {showDetailsView && selectedLead && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700">
+            <div className="mb-6">
+              <span className="text-xl font-bold text-white">Lead Details</span>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-slate-300">
+                    <User className="w-4 h-4" /> Lead Name
+                  </Label>
+                  <div className="text-white font-medium">{detailsFormData.leadName}</div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-slate-300">
+                    <Building className="w-4 h-4" /> Company
+                  </Label>
+                  <div className="text-white font-medium">{detailsFormData.company}</div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-slate-300">
+                    <Phone className="w-4 h-4" /> Contact
+                  </Label>
+                  <div className="text-white font-medium">{detailsFormData.contact}</div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-slate-300">
+                    <Mail className="w-4 h-4" /> Email
+                  </Label>
+                  <div className="text-white font-medium">{detailsFormData.email}</div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2 text-slate-300">
+                  <ArrowRightCircle className="w-4 h-4" /> Source
+                </Label>
+                <div className="text-white font-medium">{detailsFormData.source}</div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-slate-300">Status</Label>
+                <div>{getStatusBadge(detailsFormData.status)}</div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2 text-slate-300">
+                  <FileText className="w-4 h-4" /> Notes
+                </Label>
+                <div className="text-white font-medium">{detailsFormData.notes || 'No notes available'}</div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={handleCancelDetails}>
+                  <X className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+                <Button onClick={() => {
+                  setShowDetailsView(false);
+                  setShowEditView(true);
+                  setIsEditingDetails(true);
+                }} className="bg-gradient-to-r from-green-500 to-blue-500">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Lead
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Edit Lead View */}
+      {showEditView && selectedLead && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700">
+            <div className="mb-6">
+              <span className="text-xl font-bold text-white">Edit Lead</span>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-leadName" className="flex items-center gap-2 text-slate-300">
+                    <User className="w-4 h-4" /> Lead Name *
+                  </Label>
+                  <Input
+                    id="edit-leadName"
+                    placeholder="Jane Doe"
+                    value={detailsFormData.leadName || ''}
+                    onChange={(e) => handleDetailsFormChange('leadName', e.target.value)}
+                    className="bg-slate-800/50 border-slate-600 text-white"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-company" className="flex items-center gap-2 text-slate-300">
+                    <Building className="w-4 h-4" /> Company *
+                  </Label>
+                  <Input
+                    id="edit-company"
+                    placeholder="Innovate Corp."
+                    value={detailsFormData.company || ''}
+                    onChange={(e) => handleDetailsFormChange('company', e.target.value)}
+                    className="bg-slate-800/50 border-slate-600 text-white"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-contact" className="flex items-center gap-2 text-slate-300">
+                    <Phone className="w-4 h-4" /> Contact
+                  </Label>
+                  <Input
+                    id="edit-contact"
+                    placeholder="+1 555-987-6543"
+                    value={detailsFormData.contact || ''}
+                    onChange={(e) => handleDetailsFormChange('contact', e.target.value)}
+                    className="bg-slate-800/50 border-slate-600 text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-email" className="flex items-center gap-2 text-slate-300">
+                    <Mail className="w-4 h-4" /> Email *
+                  </Label>
+                  <Input
+                    id="edit-email"
+                    type="email"
+                    placeholder="jane.doe@example.com"
+                    value={detailsFormData.email || ''}
+                    onChange={(e) => handleDetailsFormChange('email', e.target.value)}
+                    className="bg-slate-800/50 border-slate-600 text-white"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-source" className="flex items-center gap-2 text-slate-300">
+                  <ArrowRightCircle className="w-4 h-4" /> Source
+                </Label>
+                <Input
+                  id="edit-source"
+                  placeholder="e.g., Website, LinkedIn, Referral"
+                  value={detailsFormData.source || ''}
+                  onChange={(e) => handleDetailsFormChange('source', e.target.value)}
+                  className="bg-slate-800/50 border-slate-600 text-white"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-slate-300">Status</Label>
+                <Select
+                  value={detailsFormData.status || 'not-started'}
+                  onValueChange={(value) => handleDetailsFormChange('status', value)}
+                >
+                  <SelectTrigger className="bg-slate-800/50 border-slate-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectItem value="not-started">Not Started</SelectItem>
+                    <SelectItem value="in-progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="follow-up">Follow Up</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-notes" className="flex items-center gap-2 text-slate-300">
+                  <FileText className="w-4 h-4" /> Notes
+                </Label>
+                <Textarea
+                  id="edit-notes"
+                  placeholder="Initial notes about the lead..."
+                  value={detailsFormData.notes || ''}
+                  onChange={(e) => handleDetailsFormChange('notes', e.target.value)}
+                  className="bg-slate-800/50 border-slate-600 text-white"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={handleCancelDetails}>
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveDetails} className="bg-gradient-to-r from-green-500 to-blue-500">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Call Log View */}
+      {showCallView && selectedLead && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700">
+            <div className="mb-6">
+              <span className="text-xl font-bold text-white">Call Log - {selectedLead.leadName}</span>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="call-date" className="flex items-center gap-2 text-slate-300">
+                    <FileText className="w-4 h-4" /> Call Date
+                  </Label>
+                  <Input
+                    id="call-date"
+                    type="date"
+                    value={callFormData.date}
+                    onChange={(e) => handleCallFormChange('date', e.target.value)}
+                    className="bg-slate-800/50 border-slate-600 text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-300">Update Status</Label>
+                  <Select
+                    value={callFormData.status}
+                    onValueChange={(value) => handleCallFormChange('status', value)}
+                  >
+                    <SelectTrigger className="bg-slate-800/50 border-slate-600 text-white">
+                      <SelectValue placeholder="Keep current status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-600">
+                      <SelectItem value="">Keep current status</SelectItem>
+                      <SelectItem value="not-started">Not Started</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="follow-up">Follow Up</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="call-notes" className="flex items-center gap-2 text-slate-300">
+                  <FileText className="w-4 h-4" /> Call Notes *
+                </Label>
+                <Textarea
+                  id="call-notes"
+                  placeholder="Enter call details and outcomes..."
+                  value={callFormData.notes}
+                  onChange={(e) => handleCallFormChange('notes', e.target.value)}
+                  className="bg-slate-800/50 border-slate-600 text-white"
+                  rows={4}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="next-followup" className="flex items-center gap-2 text-slate-300">
+                  <ArrowRightCircle className="w-4 h-4" /> Next Follow-up
+                </Label>
+                <Input
+                  id="next-followup"
+                  placeholder="e.g., Call back in 3 days, Send proposal..."
+                  value={callFormData.nextFollowUp}
+                  onChange={(e) => handleCallFormChange('nextFollowUp', e.target.value)}
+                  className="bg-slate-800/50 border-slate-600 text-white"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={handleCancelCall}>
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveCall} className="bg-gradient-to-r from-green-500 to-blue-500">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Call Log
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Search and Filter - Only show when not in any form mode */}
+      {!showAddForm && !showDetailsView && !showCallView && !showEditView && (
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -458,8 +870,8 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         </div>
       )}
 
-      {/* Desktop Table View - Only show when not in add form mode */}
-      {!showAddForm && (
+      {/* Desktop Table View - Only show when not in any form mode */}
+      {!showAddForm && !showDetailsView && !showCallView && !showEditView && (
         <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
@@ -534,8 +946,8 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         </div>
       )}
 
-      {/* Mobile Card View - Only show when not in add form mode */}
-      {!showAddForm && (
+      {/* Mobile Card View - Only show when not in any form mode */}
+      {!showAddForm && !showDetailsView && !showCallView && !showEditView && (
         <div className="grid grid-cols-1 gap-4 md:hidden">
         {canManageLeads && (
           <div className="flex items-center p-2">
@@ -597,7 +1009,7 @@ const LeadsTable = ({ leads, setLeads, onLeadStatusChange }) => {
         </div>
       )}
 
-      {!showAddForm && filteredLeads.length === 0 && (
+      {!showAddForm && !showDetailsView && !showCallView && !showEditView && filteredLeads.length === 0 && (
         <div className="text-center py-8"><p className="text-slate-400">No leads found</p></div>
       )}
 
