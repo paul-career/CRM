@@ -5,14 +5,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', section: 'dashboard', permissions: ['admin', 'sales', 'user'] },
-  { icon: Users, label: 'Clients', section: 'accounts', permissions: ['admin', 'sales'] },
-  { icon: BarChart, label: 'Leads', section: 'leads', permissions: ['admin', 'sales', 'user'] },
-  { icon: Calendar, label: 'Meeting Fixed', section: 'meeting', permissions: ['admin', 'sales', 'user'] },
-  { icon: DollarSign, label: 'Finance', section: 'finance', permissions: ['admin', 'sales'] },
-  { icon: BarChart, label: 'Reports', section: 'reports', permissions: ['admin', 'sales'] },
-  { icon: UserCog, label: 'User Management', section: 'user-management', permissions: ['admin'] },
-  { icon: Settings, label: 'Settings', section: 'settings', permissions: ['admin', 'sales', 'user'] },
+  { icon: LayoutDashboard, label: 'Dashboard', section: 'dashboard', permissions: ['super-admin', 'lead', 'agent'] },
+  { icon: Users, label: 'Clients', section: 'accounts', permissions: ['super-admin', 'lead'] },
+  { icon: BarChart, label: 'Leads', section: 'leads', permissions: ['super-admin', 'lead', 'agent'] },
+  { icon: Calendar, label: 'Meeting Fixed', section: 'meeting', permissions: ['super-admin', 'lead', 'agent'] },
+  { icon: DollarSign, label: 'Finance', section: 'finance', permissions: ['super-admin', 'lead'] },
+  { icon: BarChart, label: 'Reports', section: 'reports', permissions: ['super-admin', 'lead'] },
+  { icon: UserCog, label: 'User Management', section: 'user-management', permissions: ['super-admin'] },
+  { icon: Settings, label: 'Settings', section: 'settings', permissions: ['super-admin', 'lead', 'agent'] },
 ];
 
 const NavItem = ({ icon: Icon, label, isActive, onClick }) => (
