@@ -69,10 +69,10 @@ const LoginPage = () => {
   return (
     <>
       <Helmet>
-        <title>Login - CRM Lead Management System</title>
-        <meta name="description" content="Access your CRM dashboard to manage leads, clients, and sales activities. Secure login for Admin, Sales Team, and User roles." />
-        <meta property="og:title" content="Login - CRM Lead Management System" />
-        <meta property="og:description" content="Access your CRM dashboard to manage leads, clients, and sales activities. Secure login for Admin, Sales Team, and User roles." />
+        <title>Login - Call 360 Lead Management System</title>
+        <meta name="description" content="Access your Call 360 dashboard to manage leads, clients, and sales activities. Secure login for Admin, Sales Team, and User roles." />
+        <meta property="og:title" content="Login - Call 360 Lead Management System" />
+        <meta property="og:description" content="Access your Call 360 dashboard to manage leads, clients, and sales activities. Secure login for Admin, Sales Team, and User roles." />
       </Helmet>
 
       <div className="min-h-screen flex">
@@ -87,7 +87,7 @@ const LoginPage = () => {
             <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
               <Building2 className="w-12 h-12 text-white" />
             </div>
-            <span className="text-5xl font-bold text-white mb-4 block">CRM Pro</span>
+            <span className="text-5xl font-bold text-white mb-4 block">Call 360</span>
             <p className="text-xl text-slate-300 mb-8">Lead Management System</p>
             <div className="space-y-4 text-left">
               <div className="flex items-center gap-3">
@@ -124,7 +124,7 @@ const LoginPage = () => {
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Building2 className="w-8 h-8 text-white" />
               </div>
-              <span className="text-3xl font-bold text-white">CRM Pro</span>
+              <span className="text-3xl font-bold text-white">Call 360</span>
               <p className="text-slate-400 mt-2">Lead Management System</p>
             </motion.div>
 
